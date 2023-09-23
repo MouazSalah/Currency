@@ -4,12 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
-import com.areeb.moviesexplorer.R
-import com.banquemisr.currency.ui.ui.main.base.MainActivity
+import com.banquemisr.currency.R
+import com.banquemisr.currency.ui.ui.base.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 @AndroidEntryPoint
 class SplashActivity : ComponentActivity() {
 
@@ -26,7 +27,6 @@ class SplashActivity : ComponentActivity() {
             finish()
         }
     }
-
 
     override fun onDestroy() {
         delayJob?.cancel()

@@ -1,30 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+
+<navigation 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
-    app:startDestination="@id/moviesListFragment">
+    app:startDestination="@id/converterFragment">
 
     <fragment
-        android:id="@+id/moviesListFragment"
-        android:name="com.banquemisr.currency.ui.ui.main.movieslist.ui.MoviesListFragment"
-        tools:layout="@layout/fragment_movies_list"
-        android:label="MoviesListFragment" >
-
-        <action
-            android:id="@+id/action_moviesList_to_movieDetail"
-            app:destination="@id/movieDetailsFragment"
-            app:popUpTo="@id/moviesListFragment" />
+        android:id="@+id/converterFragment"
+        android:name="com.banquemisr.currency.ui.ui.convert.ConvertCurrencyFragment"
+        tools:layout="@layout/fragment_convert_currency" >
 
     </fragment>
-
-    <fragment
-        android:id="@+id/movieDetailsFragment"
-        android:name="com.banquemisr.currency.ui.ui.main.moviesdetails.ui.MovieDetailsFragment"
-        tools:layout="@layout/fragment_movie_details"
-        android:label="MovieDetailsFragment" >
-        <argument
-            android:name="movieId"
-            app:argType="string" />
-    </fragment>
+    
 </navigation>

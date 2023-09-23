@@ -1,8 +1,9 @@
 package com.banquemisr.currency.ui.di
 
 import android.content.Context
+import com.banquemisr.currency.BuildConfig
 import com.banquemisr.currency.ui.network.MovieInterceptor
-import com.banquemisr.currency.ui.network.MoviesWebServices
+import com.banquemisr.currency.ui.data.MoviesWebServices
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import dagger.Module
@@ -31,7 +32,7 @@ class NetworkModule {
     ): OkHttpClient {
         val okHttpClientBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
         okHttpClientBuilder.addInterceptor(moviesInterceptor)
-        if (com.areeb.moviesexplorer.BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
             okHttpClientBuilder.addInterceptor(loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY))
                 .addInterceptor(
                     ChuckerInterceptor.Builder(context)
@@ -51,7 +52,7 @@ class NetworkModule {
     @Provides
     fun provideAuthRetrofit(@DIAnnotation.MoviesRetrofit okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(com.areeb.moviesexplorer.BuildConfig.BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

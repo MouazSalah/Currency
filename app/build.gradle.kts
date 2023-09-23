@@ -12,10 +12,10 @@ plugins{
 android {
 
     compileSdk = 34
-    namespace = "com.areeb.moviesexplorer"
+    namespace = "com.banquemisr.currency"
 
     defaultConfig {
-        applicationId = "com.areeb.moviesexplorer"
+        applicationId = "com.banquemisr.currency"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -135,5 +135,9 @@ android {
 
         implementation("com.facebook.shimmer:shimmer:0.5.0")
         implementation("com.github.skydoves:powerspinner:1.2.4")
+
+        // Room
+        implementation("androidx.room:room-ktx:2.5.2")
+        ksp("androidx.room:room-compiler:2.5.2")
     }
 }

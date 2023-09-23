@@ -1,10 +1,13 @@
 package com.banquemisr.currency.ui.di
 
-import com.banquemisr.currency.ui.network.IMoviesIRemoteDataSourceRepo
-import com.banquemisr.currency.ui.network.MoviesWebServices
-import com.banquemisr.currency.ui.network.RemoteDataSourceRepoImpl
-import com.banquemisr.currency.ui.ui.main.movieslist.domain.IMovieRepository
-import com.banquemisr.currency.ui.ui.main.movieslist.domain.MovieRepositoryImpl
+import com.banquemisr.currency.ui.data.CurrencyLocalDataSourceRepoImpl
+import com.banquemisr.currency.ui.data.ICurrencyLocalDataSourceRepo
+import com.banquemisr.currency.ui.data.IMoviesIRemoteDataSourceRepo
+import com.banquemisr.currency.ui.data.MoviesWebServices
+import com.banquemisr.currency.ui.data.RemoteDataSourceRepoImpl
+import com.banquemisr.currency.ui.db.CurrencyDao
+import com.banquemisr.currency.ui.domain.repository.ICurrencyRepository
+import com.banquemisr.currency.ui.domain.repository.CurrencyRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,6 +25,11 @@ class RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideMoviesRepository(remoteDataSource: RemoteDataSourceRepoImpl): IMovieRepository = MovieRepositoryImpl(remoteDataSource)
+    fun provideLocalDataSource(moviesDao : CurrencyDao): ICurrencyLocalDataSourceRepo = CurrencyLocalDataSourceRepoImpl(moviesDao)
+
+
+    @Singleton
+    @Provides
+    fun provideMoviesRepository(remoteDataSource: RemoteDataSourceRepoImpl): ICurrencyRepository = CurrencyRepositoryImpl(remoteDataSource)
 
 }

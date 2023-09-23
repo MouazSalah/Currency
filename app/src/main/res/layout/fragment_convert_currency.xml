@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.banquemisr.currency.ui.ui.customviews.ClickableConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="@dimen/_12sdp"
+    android:id="@+id/layout_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_currency"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_12ssp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="العملة"
+            android:textColor="@color/color_primary"
+            android:id="@+id/text_year"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.skydoves.powerspinner.PowerSpinnerView
+            android:id="@+id/spinner_years_from"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3.5"
+            android:foreground="?attr/selectableItemBackground"
+            android:background="@drawable/et_currency_bg"
+            android:hint="من"
+            android:textAlignment="viewStart"
+            android:paddingStart="@dimen/_12sdp"
+            android:paddingEnd="@dimen/_8sdp"
+            android:paddingVertical="@dimen/_8sdp"
+            android:textColor="@color/color_primary"
+            android:textColorHint="@color/grey_color"
+            android:textSize="14.5sp"
+            app:spinner_arrow_gravity="end"
+            app:spinner_arrow_padding="@dimen/_8sdp"
+            app:spinner_divider_color="@color/grey_color"
+            app:spinner_divider_show="true"
+            app:spinner_divider_size="0.2dp"
+            app:spinner_dismiss_notified_select="true"
+            app:spinner_popup_animation="dropdown"
+            app:spinner_arrow_tint="#6C94AC"
+            app:spinner_popup_background="@color/white"
+            app:spinner_popup_elevation="14dp"
+            tools:ignore="HardcodedText,UnusedAttribute"
+            android:layout_marginEnd="@dimen/_12sdp"
+            android:layout_marginStart="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ic_switch"
+            app:layout_constraintTop_toTopOf="@+id/ic_switch"
+            app:layout_constraintBottom_toBottomOf="@+id/ic_switch" />
+
+        <ImageView
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:id="@+id/ic_switch"
+            android:src="@drawable/ic_switch"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_year"
+            app:tint="@color/color_primary" />
+
+        <com.skydoves.powerspinner.PowerSpinnerView
+            android:id="@+id/spinner_years_to"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="@dimen/_12sdp"
+            android:layout_weight="3.5"
+            android:background="@drawable/et_currency_bg"
+            android:foreground="?attr/selectableItemBackground"
+            android:textAlignment="viewStart"
+            android:hint="الي"
+            app:spinner_dismiss_notified_select="true"
+            android:paddingStart="@dimen/_12sdp"
+            android:paddingEnd="@dimen/_8sdp"
+            android:paddingVertical="@dimen/_8sdp"
+            android:textColor="@color/color_primary"
+            android:textColorHint="@color/grey_color"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_switch"
+            app:layout_constraintTop_toTopOf="@+id/ic_switch"
+            app:layout_constraintBottom_toBottomOf="@+id/ic_switch"
+            app:spinner_arrow_gravity="end"
+            app:spinner_arrow_tint="@color/color_primary"
+            app:spinner_divider_color="@color/grey_color"
+            app:spinner_divider_show="true"
+            app:spinner_divider_size="0.3dp"
+            app:spinner_popup_animation="dropdown"
+            app:spinner_popup_background="@color/white"
+            app:spinner_popup_elevation="@dimen/_8sdp"
+            tools:ignore="HardcodedText,UnusedAttribute" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/view_divider"
+        android:background="@color/quantum_grey200"
+        android:layout_marginTop="@dimen/_24sdp"
+        app:layout_constraintTop_toBottomOf="@id/layout_currency"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_amount"
+        android:layout_marginTop="@dimen/_24sdp"
+        app:layout_constraintTop_toBottomOf="@+id/view_divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_12ssp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="القيمة"
+            android:textColor="@color/color_red"
+            android:id="@+id/text_price"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/layout_price_from"
+            android:layout_marginTop="@dimen/_4sdp"
+            app:layout_constraintTop_toBottomOf="@+id/text_price"
+            app:layout_constraintStart_toStartOf="@id/text_price"
+            app:layout_constraintEnd_toStartOf="@+id/layout_price_to">
+
+            <com.banquemisr.currency.ui.ui.customviews.CurrencyEditText
+                android:id="@+id/et_price_from"
+                style="@style/rounded_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="@dimen/_4sdp"
+                android:imeOptions="actionNext"
+                android:textAlignment="viewStart"
+                tools:text="50000"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:digits="1234567890٠١٢٣٤٥٦٧٨٩"
+                android:inputType="phone" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/layout_price_to"
+            android:layout_marginStart="@dimen/_4sdp"
+            app:layout_constraintTop_toTopOf="@id/layout_price_from"
+            app:layout_constraintStart_toEndOf="@+id/layout_price_from"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.banquemisr.currency.ui.ui.customviews.CurrencyEditText
+                android:id="@+id/et_price_to"
+                style="@style/rounded_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:imeOptions="actionNext"
+                android:textAlignment="viewStart"
+                tools:text="50000"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:digits="1234567890٠١٢٣٤٥٦٧٨٩"
+                android:inputType="phone" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+</com.banquemisr.currency.ui.ui.customviews.ClickableConstraintLayout>
