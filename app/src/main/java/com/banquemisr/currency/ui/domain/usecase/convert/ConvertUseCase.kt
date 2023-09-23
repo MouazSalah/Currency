@@ -1,7 +1,7 @@
 package com.banquemisr.currency.ui.domain.usecase.convert
 
-import com.banquemisr.currency.ui.data.ConvertParams
-import com.banquemisr.currency.ui.data.ConvertResponse
+import com.banquemisr.currency.ui.data.model.convert.ConvertParams
+import com.banquemisr.currency.ui.data.model.convert.ConvertResponse
 import com.banquemisr.currency.ui.domain.repository.ICurrencyRepository
 import javax.inject.Inject
 

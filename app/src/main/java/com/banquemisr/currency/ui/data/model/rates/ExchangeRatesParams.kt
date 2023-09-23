@@ -1,14 +1,18 @@
-package com.banquemisr.currency.ui.data
+package com.banquemisr.currency.ui.data.model.rates
 
 import com.banquemisr.currency.ui.core.HashMapParams
 import com.google.gson.annotations.SerializedName
 
-data class SymbolsParams(
+data class ExchangeRatesParams(
     @SerializedName("access_key")
     var accessKey: String? = null,
 
-    @SerializedName("format")
-    var format: Int = 1
+    @SerializedName("base")
+    var base: String? = null,
+
+    @SerializedName("symbols")
+    var symbols: String? = null,
+
 ) : HashMapParams {
     override fun dataClass(): Any = this
 }

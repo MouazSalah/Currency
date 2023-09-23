@@ -1,16 +1,23 @@
 package com.banquemisr.currency.ui.domain.repository
 
 import com.banquemisr.currency.ui.core.BaseApp
-import com.banquemisr.currency.ui.data.ExchangeRates
-import com.banquemisr.currency.ui.data.LatestParams
-import com.banquemisr.currency.ui.data.ConvertParams
-import com.banquemisr.currency.ui.data.ConvertResponse
-import com.banquemisr.currency.ui.data.ICurrencyLocalDataSourceRepo
-import com.banquemisr.currency.ui.data.ICurrencyRemoteDataSourceRepo
-import com.banquemisr.currency.ui.data.SymbolsParams
-import com.banquemisr.currency.ui.data.SymbolsResponse
+import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesParams
+import com.banquemisr.currency.ui.data.model.convert.ConvertParams
+import com.banquemisr.currency.ui.data.model.convert.ConvertResponse
+import com.banquemisr.currency.ui.data.datasource.ICurrencyLocalDataSourceRepo
+import com.banquemisr.currency.ui.data.api.ICurrencyRemoteDataSourceRepo
+import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesApiModel
+import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesEntity
+import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesUIModel
+import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
+import com.banquemisr.currency.ui.data.model.symbols.SymbolsResponse
+import com.banquemisr.currency.ui.domain.mapper.ExchangeRatesMapper
 import com.banquemisr.currency.ui.extesnion.isNetworkAvailable
+import com.banquemisr.currency.ui.extesnion.showLogMessage
 import com.banquemisr.currency.ui.network.ApiResult
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class CurrencyRepositoryImpl @Inject constructor(
@@ -18,71 +25,85 @@ class CurrencyRepositoryImpl @Inject constructor(
     private val remoteDataSource: ICurrencyRemoteDataSourceRepo
 ) : ICurrencyRepository {
 
-    override suspend fun getExchangeRates(params: LatestParams): ApiResult<ExchangeRates> {
+
+    override suspend fun getExchangeRatesFromApi(params: ExchangeRatesParams): ApiResult<ExchangeRatesUIModel> {
         return if (isNetworkAvailable(BaseApp.instance.applicationContext)) {
             try {
+                "collect method before calling ".showLogMessage()
 
-               // val response = remoteDataSource.get(params)
+                GlobalScope.launch {
 
-                ApiResult.Success(ExchangeRates(base = "", date = "", rates = mapOf()))
+                    "collect method before calling  GlobalScope ".showLogMessage()
+
+                    remoteDataSource.getExchangeRates(params).collect{ value ->
+                        "collect method is called ".showLogMessage()
+                        "collect method is called ${value.toString()} ".showLogMessage()
+                    }
+                }
+                "collect method before calling ".showLogMessage()
+
+                ApiResult.ApiError(Exception("Mapping error"))
+
+//                var exchangeRateUIModel: ExchangeRatesUIModel? = null
+//
+//                response.collect { exchangeRates ->
+//
+//                    "collect method is called".showLogMessage()
+//
+//                    insertExchangeRatesToRoom(exchangeRates)
+//                    exchangeRateUIModel = ExchangeRatesMapper.mapApiModelToUIModel(exchangeRates)
+//                }
+//
+//                if (exchangeRateUIModel != null) {
+//
+//                    "api called successfully".showLogMessage()
+//
+//                    ApiResult.Success(exchangeRateUIModel!!)
+//                } else {
+//
+//                    if (getExchangeRatesFromRoom() != null)
+//                    {
+//                        "room data is NOOOOT null".showLogMessage()
+//                    }
+//                    else {
+//                        "room data is null".showLogMessage()
+//                    }
+//
+//                    ApiResult.ApiError(Exception("Mapping error"))
+//                }
+
             } catch (e: Exception) {
-                ApiResult.Error(e)
+                "catch exception ${e.message.toString()}".showLogMessage()
+
+                if (getExchangeRatesFromRoom() != null)
+                {
+                    "catch exception room data is NOOOOT null".showLogMessage()
+                }
+                else {
+                    "catch exception  room data is null".showLogMessage()
+                }
+                ApiResult.ApiError(e)
             }
         } else {
-            ApiResult.Error(Exception("No internet connection")) // Custom exception for no internet
+            ApiResult.InternetError(Exception("No internet connection")) // Custom exception for no internet
         }
     }
 
-//    override suspend fun getExchangeRatesFlow(params: LatestParams): Flow<ExchangeRates> {
-//        return remoteDataSource.getExchangeRates(params)
-//    }
+    override suspend fun insertExchangeRatesToRoom(exchangeRates: ExchangeRatesApiModel) {
+        "insertExchangeRatesToRoom before ".showLogMessage()
+        val exchangeRatesEntity : ExchangeRatesEntity = ExchangeRatesMapper.mapApiModelToRoomModel(exchangeRates)
+        "insertExchangeRatesToRoom exchangeRatesEntity = $exchangeRatesEntity".showLogMessage()
+        localDataSourceRepo.insertExchangeRates(exchangeRatesEntity)
+    }
 
-//    override suspend fun getExchangeRates(params: LatestParams): ExchangeRates {
-//
-//        var exchangeRates : ExchangeRates
-//
-//        if (isNetworkAvailable(BaseApp.instance.applicationContext)) {
-//
-//            remoteDataSource.getLatest(params).collect{ result ->
-//                when (result) {
-//                    is ApiResult.Success -> {
-//                        exchangeRates = result.data
-//
-//                        localDataSourceRepo.insertExchangeRates(ExchangeRatesEntity(
-//                            base = exchangeRates.base,
-//                            date = exchangeRates.date,
-//                            rates = exchangeRates.rates
-//                        ))
-//                    }
-//                    is ApiResult.Error -> {
-//                        exchangeRates = result.data
-//                    }
-//                }
-//            }
-//        }
-//        else {
-//
-//        }
-//
-//        remoteDataSource.getLatest(params).collect{ result ->
-//            when (result) {
-//                is ApiResult.Success -> {
-//                    exchangeRates = result.data
-//
-//                    localDataSourceRepo.insertExchangeRates(ExchangeRatesEntity(
-//                        base = exchangeRates.base,
-//                        date = exchangeRates.date,
-//                        rates = exchangeRates.rates
-//                    ))
-//                }
-//                is ApiResult.Error -> {
-//                    exchangeRates = result.data
-//                }
-//            }
-//        }
-//
-//        return remoteDataSource.getLatest(params)
-//    }
+    override suspend fun getExchangeRatesFromRoom(): ExchangeRatesUIModel? {
+        val exchangeRatesRoomModel : ExchangeRatesEntity? = localDataSourceRepo.loadExchangeRates()
+        return if (exchangeRatesRoomModel == null)
+            null
+        else
+            ExchangeRatesMapper.mapRoomModelToUIModel(exchangeRatesRoomModel)
+    }
+
 
     override suspend fun getSymbols(params: SymbolsParams): SymbolsResponse {
         return remoteDataSource.getSymbols(params)

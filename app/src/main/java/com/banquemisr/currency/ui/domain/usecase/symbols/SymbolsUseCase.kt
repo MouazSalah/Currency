@@ -1,7 +1,7 @@
 package com.banquemisr.currency.ui.domain.usecase.symbols
 
-import com.banquemisr.currency.ui.data.SymbolsParams
-import com.banquemisr.currency.ui.data.SymbolsResponse
+import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
+import com.banquemisr.currency.ui.data.model.symbols.SymbolsResponse
 import com.banquemisr.currency.ui.domain.repository.ICurrencyRepository
 import javax.inject.Inject
 

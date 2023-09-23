@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.banquemisr.currency.ui.data.ExchangeRatesEntity
+import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesEntity
 
 @Dao
 interface CurrencyDao {

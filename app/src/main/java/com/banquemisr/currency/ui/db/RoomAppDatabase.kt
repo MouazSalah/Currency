@@ -3,7 +3,7 @@ package com.banquemisr.currency.ui.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.banquemisr.currency.ui.data.ExchangeRatesEntity
+import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesEntity
 
 @Database(entities = [ExchangeRatesEntity::class], version = 1, exportSchema = false)
 @TypeConverters(MapTypeConverter::class)

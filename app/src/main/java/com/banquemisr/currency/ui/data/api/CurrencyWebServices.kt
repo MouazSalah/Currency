@@ -1,6 +1,8 @@
-package com.banquemisr.currency.ui.data
+package com.banquemisr.currency.ui.data.api
 
-import com.banquemisr.currency.ui.network.ApiResult
+import com.banquemisr.currency.ui.data.model.convert.ConvertResponse
+import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesApiModel
+import com.banquemisr.currency.ui.data.model.symbols.SymbolsResponse
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.*
 
@@ -13,7 +15,7 @@ interface CurrencyWebServices {
     }
 
     @GET(LATEST)
-    suspend fun getExchangeRates(@QueryMap param: HashMap<String, String?>): Flow<ExchangeRates>
+    suspend fun getExchangeRates(@QueryMap param: HashMap<String, String?>): Flow<ExchangeRatesApiModel>
 
     @GET(SYMBOLS)
     suspend fun getSymbols(@QueryMap param: HashMap<String, String?>): SymbolsResponse

@@ -20,6 +20,8 @@ import org.json.JSONObject
 import timber.log.Timber
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToLong
 
@@ -27,6 +29,15 @@ fun getMostCommonCurrencies(): ArrayList<String>{
     return arrayListOf(
          "EGP", "USD", "EUR", "JPY", "GBP", "CNY", "AUD", "CAD", "CHF", "HKD",
     )
+}
+
+fun getCurrentTimeInMilliSeconds() : Long {
+    return System.currentTimeMillis()
+}
+
+fun Long.toFormattedDate(): String {
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return sdf.format(Date(this))
 }
 
 fun getAllCurrencies(): ArrayList<String>{

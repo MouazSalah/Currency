@@ -1,5 +1,6 @@
-package com.banquemisr.currency.ui.data
+package com.banquemisr.currency.ui.data.datasource
 
+import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesEntity
 import com.banquemisr.currency.ui.db.CurrencyDao
 import javax.inject.Inject
 

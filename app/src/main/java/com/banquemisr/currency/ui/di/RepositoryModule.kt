@@ -1,10 +1,10 @@
 package com.banquemisr.currency.ui.di
 
-import com.banquemisr.currency.ui.data.CurrencyLocalDataSourceRepoImpl
-import com.banquemisr.currency.ui.data.ICurrencyLocalDataSourceRepo
-import com.banquemisr.currency.ui.data.ICurrencyRemoteDataSourceRepo
-import com.banquemisr.currency.ui.data.CurrencyWebServices
-import com.banquemisr.currency.ui.data.CurrencyRemoteDataSourceRepoImpl
+import com.banquemisr.currency.ui.data.datasource.CurrencyLocalDataSourceRepoImpl
+import com.banquemisr.currency.ui.data.datasource.ICurrencyLocalDataSourceRepo
+import com.banquemisr.currency.ui.data.api.ICurrencyRemoteDataSourceRepo
+import com.banquemisr.currency.ui.data.api.CurrencyWebServices
+import com.banquemisr.currency.ui.data.datasource.CurrencyRemoteDataSourceRepoImpl
 import com.banquemisr.currency.ui.db.CurrencyDao
 import com.banquemisr.currency.ui.domain.repository.ICurrencyRepository
 import com.banquemisr.currency.ui.domain.repository.CurrencyRepositoryImpl

@@ -16,17 +16,48 @@ class DataStoreManager @Inject constructor(val context: Context, val gson: Gson)
     private val Context.dataStore : DataStore<Preferences> by preferencesDataStore(name = "CURRENCY_PREF")
 
     fun setLastFetchDate(
-        date: String?, coroutineScope: CoroutineScope,
+        date: Long?, coroutineScope: CoroutineScope,
         callBack: (Boolean) -> Unit = {}
     ) {
-        writePrefString(
+        writePrefLong(
             PreferenceKeys.LAST_FETCH_RATES_DATE,
             date,
             coroutineScope, callBack
         )
     }
 
-    fun getLastFetchDate(): String? = readPrefStringBlocking(PreferenceKeys.LAST_FETCH_RATES_DATE)
+    fun getLastFetchDate(): Long? = readPrefLongBlocking(PreferenceKeys.LAST_FETCH_RATES_DATE)
+
+
+    private fun writePrefLong(
+        key: Preferences.Key<Long>,
+        value: Long?,
+        coroutineScope: CoroutineScope,
+        callBack: (Boolean) -> Unit = {}
+    ) {
+        coroutineScope.launch {
+            context.dataStore.edit { settings ->
+                if (value != null) {
+                    settings[key] = value
+                    callBack.invoke(true)
+                } else
+                    callBack.invoke(false)
+            }
+        }
+    }
+
+    private fun readPrefLongBlocking(
+        key: Preferences.Key<Long>,
+        defaultValue: Long = 0L
+    ): Long {
+        val storedValue = runBlocking { context.dataStore.data.first()[key] }
+        return try {
+            storedValue?.toString()?.toLong() ?: defaultValue
+        } catch (e: NumberFormatException) {
+            defaultValue
+        }
+    }
+
 
     private fun readPrefStringBlocking(
         key: Preferences.Key<String>,
@@ -51,7 +82,6 @@ class DataStoreManager @Inject constructor(val context: Context, val gson: Gson)
         }
     }
 
-    //region clear pref
     fun clearAllData(scope: CoroutineScope) {
         scope.launch {
             context.dataStore.edit {
@@ -71,5 +101,5 @@ class DataStoreManager @Inject constructor(val context: Context, val gson: Gson)
 }
 
 object PreferenceKeys {
-    val LAST_FETCH_RATES_DATE = stringPreferencesKey("last_fetch_rates_date")
+    val LAST_FETCH_RATES_DATE = longPreferencesKey("last_fetch_rates_date")
 }

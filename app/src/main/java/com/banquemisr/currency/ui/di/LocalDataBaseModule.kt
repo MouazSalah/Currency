@@ -2,8 +2,8 @@ package com.banquemisr.currency.ui.di
 
 import android.content.Context
 import androidx.room.Room
-import com.banquemisr.currency.ui.data.CurrencyLocalDataSourceRepoImpl
-import com.banquemisr.currency.ui.data.ICurrencyLocalDataSourceRepo
+import com.banquemisr.currency.ui.data.datasource.CurrencyLocalDataSourceRepoImpl
+import com.banquemisr.currency.ui.data.datasource.ICurrencyLocalDataSourceRepo
 import com.banquemisr.currency.ui.db.CurrencyDao
 import com.banquemisr.currency.ui.db.RoomAppDatabase
 import dagger.Module

@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.banquemisr.currency.R
 import com.banquemisr.currency.databinding.FragmentConvertCurrencyBinding
+import com.banquemisr.currency.ui.core.TimeAgo
 import com.banquemisr.currency.ui.extesnion.afterTextChanged
 import com.banquemisr.currency.ui.extesnion.castToActivity
 import com.banquemisr.currency.ui.extesnion.formatPrice
@@ -40,10 +41,10 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
         binding.apply {
 
             val fromCurrenciesList : ArrayList<String> = getMostCommonCurrencies()
-            fromCurrenciesList.add(0, "من")
+            fromCurrenciesList.add(0, "From")
 
             val toCurrenciesList : ArrayList<String> = getMostCommonCurrencies()
-            toCurrenciesList.add(0, "الي")
+            toCurrenciesList.add(0, "To")
 
             spinnerYearsFrom.setItems(fromCurrenciesList)
             spinnerYearsTo.setItems(toCurrenciesList)
@@ -64,7 +65,7 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                         }
                         else -> {
                             text = null
-                            hint = "من"
+                            hint = "From"
 
                             "before reset from sourceCurrency : ${viewModel.sourceCurrency}".showLogMessage()
                             "before reset from destinationCurrency : ${viewModel.destinationCurrency}".showLogMessage()
@@ -103,7 +104,7 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                             "before reset to destinationCurrency : ${viewModel.destinationCurrency}".showLogMessage()
 
                             text = null
-                            hint = "الي"
+                            hint = "To"
                             viewModel.convertParams.currencyTo = null
                             viewModel.destinationCurrency = null
 
@@ -137,8 +138,8 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
     private fun initAmountViews() {
         binding.apply {
 
-            etPriceFrom.hint = "من"
-            etPriceTo.hint = "الي"
+            etPriceFrom.hint = "From"
+            etPriceTo.hint = "To"
 
             etPriceFrom.onFocusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
                 if (hasFocus) {
@@ -209,7 +210,14 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
         lifecycleScope.launch {
             viewModel.convertCurrencyState.collect{ state ->
                 when (state) {
-                    ConvertCurrencyState.Loading -> {
+                    is ConvertCurrencyState.Loading -> {
+                        castToActivity<MainActivity> {
+                            it?.showProgress(state.isShow)
+                        }
+                    }
+                    is ConvertCurrencyState.LatestFetchDate -> {
+                        binding.layoutLatestDate.isVisible = true
+                        "Last Update:  ${state.date}".also { binding.textLatestDate.text = it }
                     }
                     is ConvertCurrencyState.SymbolsSuccess -> {
 
@@ -247,6 +255,10 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
     private fun initViews() {
 
         binding.apply {
+
+            refreshIcon.setOnClickListener {
+                viewModel.fetchLatestRates()
+            }
 
             // I want to switch the spinner to value to be in the spinner from value and vice versa
             // and also I want to switch the values of edittext

@@ -1,4 +1,4 @@
-package com.banquemisr.currency.ui.data
+package com.banquemisr.currency.ui.data.model.convert
 
 import com.google.gson.annotations.SerializedName
 

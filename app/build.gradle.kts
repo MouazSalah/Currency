@@ -52,7 +52,7 @@ android {
     productFlavors {
         create("staging") {
             dimension = "flavors"
-            applicationId = "com.areeb.tmdb"
+            applicationId = "com.banquemisr.currency"
             resValue("string", "app_name", "Currency")
 
             // buildConfigField("String", "BASE_URL", "\"https://api.apilayer.com/fixer/\"") // http://api.fixer.io/
