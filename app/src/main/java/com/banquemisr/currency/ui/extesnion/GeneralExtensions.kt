@@ -105,14 +105,14 @@ fun CoroutineScope.delayWithAction(
     }
 }
 
-fun formatPrice(price: Double): String {
+fun formatAmount(amount: Double): String {
     return try {
         val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.ENGLISH)
         val formatter: DecimalFormat = numberFormat as DecimalFormat
         formatter.applyPattern("#,###,###.##")
-        formatter.format(price.roundToLong())
+        formatter.format(amount)
     } catch (ex: NumberFormatException) {
-        price.toString()
+        amount.toString()
     }
 }
 

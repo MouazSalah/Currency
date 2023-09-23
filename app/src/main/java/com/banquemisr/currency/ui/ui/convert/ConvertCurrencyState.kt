@@ -11,4 +11,7 @@ sealed class ConvertCurrencyState {
     data class ConvertError(val errorMessage: String) : ConvertCurrencyState()
 
     data class LatestFetchDate(val date: String) : ConvertCurrencyState()
+
+    data class ApiError(val date: String) : ConvertCurrencyState()
+    data object InternetError : ConvertCurrencyState()
 }

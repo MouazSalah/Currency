@@ -3,16 +3,16 @@ package com.banquemisr.currency.ui.ui.convert
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.banquemisr.currency.R
 import com.banquemisr.currency.databinding.FragmentConvertCurrencyBinding
-import com.banquemisr.currency.ui.core.TimeAgo
 import com.banquemisr.currency.ui.extesnion.afterTextChanged
 import com.banquemisr.currency.ui.extesnion.castToActivity
-import com.banquemisr.currency.ui.extesnion.formatPrice
+import com.banquemisr.currency.ui.extesnion.formatAmount
 import com.banquemisr.currency.ui.extesnion.getMostCommonCurrencies
 import com.banquemisr.currency.ui.extesnion.showLogMessage
 import com.banquemisr.currency.ui.ui.base.BaseFragment
@@ -196,8 +196,9 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                         viewModel.inputSource = InputValueSource.TO
 
                         if (viewModel.sourceCurrency != null && viewModel.destinationCurrency != null) {
-                            viewModel.convertParams.currencyFrom = viewModel.destinationCurrency
-                            viewModel.convertParams.currencyTo = viewModel.sourceCurrency
+                            viewModel.sourceCurrency = viewModel.destinationCurrency.also {
+                                viewModel.destinationCurrency = viewModel.sourceCurrency
+                            }
                             viewModel.convertAmount()
                         }
                     }
@@ -207,24 +208,30 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
     }
 
     private fun initObservers() {
+
         lifecycleScope.launch {
+
             viewModel.convertCurrencyState.collect{ state ->
                 when (state) {
+
                     is ConvertCurrencyState.Loading -> {
                         castToActivity<MainActivity> {
                             it?.showProgress(state.isShow)
                         }
                     }
+
                     is ConvertCurrencyState.LatestFetchDate -> {
                         binding.layoutLatestDate.isVisible = true
                         "Last Update:  ${state.date}".also { binding.textLatestDate.text = it }
                     }
+
                     is ConvertCurrencyState.SymbolsSuccess -> {
 
                         val symbols = state.symbolsResponse.symbols
 
                         val currenciesList = arrayListOf("EGP" , "USD" , "GHD", "FGD", "EUR")
                     }
+
                     is ConvertCurrencyState.SymbolsError -> {
                         val errorMessage = state.errorMessage
                         "symbols error message : ${errorMessage.toString()} ".showLogMessage()
@@ -234,18 +241,30 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                         val errorMessage = state.errorMessage
                         "convert error message : ${errorMessage.toString()} ".showLogMessage()
                     }
+
                     is ConvertCurrencyState.ConvertSuccess -> {
                         "convert response observe".showLogMessage()
                         viewModel.isSettingTextProgrammatically = true
                         when (viewModel.inputSource) {
                             InputValueSource.FROM -> {
-                                binding.etPriceTo.setText(formatPrice(state.convertResponse.result ?: 0.0))
+                                binding.etPriceTo.setText(formatAmount(state.convertResponse.result ?: 0.0))
                             }
                             else -> {
-                                binding.etPriceFrom.setText(formatPrice(state.convertResponse.result ?: 0.0))
+                                viewModel.sourceCurrency = viewModel.destinationCurrency.also {
+                                    viewModel.destinationCurrency = viewModel.sourceCurrency
+                                }
+                                binding.etPriceFrom.setText(formatAmount(state.convertResponse.result ?: 0.0))
                             }
                         }
                         viewModel.isSettingTextProgrammatically = false
+                    }
+
+                    is ConvertCurrencyState.ApiError -> {
+
+                        Toast.makeText(requireContext(), "api error", Toast.LENGTH_SHORT).show()
+                    }
+                    ConvertCurrencyState.InternetError -> {
+                        Toast.makeText(requireContext(), "internet connection !", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -260,37 +279,18 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                 viewModel.fetchLatestRates()
             }
 
-            // I want to switch the spinner to value to be in the spinner from value and vice versa
-            // and also I want to switch the values of edittext
             icSwitch.setOnClickListener {
 
-                    val tempCurrencyFrom = viewModel.convertParams.currencyFrom
-                    val tempCurrencyTo = viewModel.convertParams.currencyTo
+                etPriceFrom.text = etPriceTo.text.also {
+                    etPriceTo.text = etPriceFrom.text
+                }
 
-                    val tempSourceCurrency = viewModel.sourceCurrency
-                    val tempDestinationCurrency = viewModel.destinationCurrency
+                val tempIndex = spinnerYearsFrom.selectedIndex
+                spinnerYearsFrom.selectItemByIndex(spinnerYearsTo.selectedIndex)
+                spinnerYearsTo.selectItemByIndex(tempIndex)
 
-                    val tempAmount = viewModel.convertParams.amount
-
-                    viewModel.convertParams.currencyFrom = tempCurrencyTo
-                    viewModel.convertParams.currencyTo = tempCurrencyFrom
-
-                    viewModel.sourceCurrency = tempDestinationCurrency
-                    viewModel.destinationCurrency = tempSourceCurrency
-
-                    viewModel.convertParams.amount = tempAmount
-
-                    viewModel.isSettingTextProgrammatically = true
-
-                    etPriceFrom.setText(etPriceTo.text.toString())
-                    etPriceTo.setText(etPriceFrom.text.toString())
-
-                    viewModel.isSettingTextProgrammatically = false
-
-                    spinnerYearsFrom.text = tempCurrencyTo
-                    spinnerYearsTo.text = tempCurrencyFrom
+                viewModel.convertAmount()
             }
-
 
             layoutParent.setOnTouchListener { view, _ ->
                 hideKeyboard()

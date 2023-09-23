@@ -10,12 +10,13 @@ import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsResponse
 import com.banquemisr.currency.ui.extesnion.toHashMapParams
 import kotlinx.coroutines.flow.Flow
+import retrofit2.Response
 import javax.inject.Inject
 
 class CurrencyRemoteDataSourceRepoImpl @Inject constructor(private val apiInterface : CurrencyWebServices) :
     ICurrencyRemoteDataSourceRepo {
 
-    override suspend fun getExchangeRates(params: ExchangeRatesParams): Flow<ExchangeRatesApiModel> {
+    override suspend fun getExchangeRates(params: ExchangeRatesParams): Response<ExchangeRatesApiModel> {
         return apiInterface.getExchangeRates(params.toHashMapParams()!!)
     }
 

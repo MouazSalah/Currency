@@ -1,5 +1,6 @@
 package com.banquemisr.currency.ui.ui.convert
 
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banquemisr.currency.BuildConfig
@@ -14,6 +15,7 @@ import com.banquemisr.currency.ui.extesnion.getCurrentTimeInMilliSeconds
 import com.banquemisr.currency.ui.extesnion.showLogMessage
 import com.banquemisr.currency.ui.extesnion.toFormattedDate
 import com.banquemisr.currency.ui.network.ApiResult
+import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -34,14 +36,12 @@ class ConvertCurrencyViewModel @Inject constructor(
 
     var convertParams = ConvertParams()
 
-    var amount: Double ?= null
     var sourceCurrency : String ?= null
     var destinationCurrency : String ?= null
 
     var isSettingTextProgrammatically = false
     var inputSource : InputValueSource = InputValueSource.FROM
-
-    var exchangeRates: ExchangeRatesUIModel? = null
+    private var exchangeRates: ExchangeRatesUIModel? = null
 
     init {
         fetchLatestRates()
@@ -51,23 +51,24 @@ class ConvertCurrencyViewModel @Inject constructor(
     fun fetchLatestRates() {
 
         viewModelScope.launch {
-            when (val result = exchangeRatesUseCase(ExchangeRatesParams(accessKey = BuildConfig.API_ACCESS_KEY, base = null, symbols = null))) {
+
+            val result = exchangeRatesUseCase(ExchangeRatesParams(accessKey = BuildConfig.API_ACCESS_KEY, base = null, symbols = null))
+            when (result) {
                 is ApiResult.Success -> {
-                    "ApiResult.Success".showLogMessage()
                     exchangeRates = result.data
                     saveLastFetchDate()
                     _convertCurrencyState.value = ConvertCurrencyState.LatestFetchDate(getLastFetchedDate(getCurrentTimeInMilliSeconds()))
                 }
                 is ApiResult.ApiError -> {
-                    "ApiResult.ApiError".showLogMessage()
                     val exception = result.exception
-                    getLastFetchDate()
-
+                    _convertCurrencyState.value = ConvertCurrencyState.ApiError( "")
                 }
                 is ApiResult.InternetError -> {
-                    "ApiResult.InternetError".showLogMessage()
                     val exception = result.exception
-                    getLastFetchDate()
+                    _convertCurrencyState.value = ConvertCurrencyState.InternetError
+                }
+                is ApiResult.CashedData -> {
+                    exchangeRates = result.data
                 }
             }
         }
@@ -95,24 +96,31 @@ class ConvertCurrencyViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            val amount =  if (exchangeRates != null) {
-                val fromRate = exchangeRates!!.rates[sourceCurrency]
-                val toRate = exchangeRates!!.rates[destinationCurrency]
-                val baseAmount = amount?.div(fromRate!!)
-                baseAmount?.times(toRate!!)
-            } else {
-                0.0 // Handle case where exchange rates are not available
-            }
+            exchangeRates?.let { rates ->
+                val fromRate = rates.rates[sourceCurrency]
+                val toRate = rates.rates[destinationCurrency]
 
-            _convertCurrencyState.value = ConvertCurrencyState.ConvertSuccess(
-                ConvertResponse(
-                    date = null,
-                    result = amount,
-                    success = null,
-                    query = null,
-                    info = null
-                )
-            )
+                "sourceCurrency : ${fromRate}".showLogMessage()
+                "destinationCurrency : ${toRate}".showLogMessage()
+                "amount : ${convertParams.amount}".showLogMessage()
+
+                fromRate?.let { fromRateValue ->
+                    toRate?.let { toRateValue ->
+                        val baseAmount = convertParams.amount?.div(fromRateValue)
+                        val convertedAmount = baseAmount?.times(toRateValue)
+
+                        _convertCurrencyState.value = ConvertCurrencyState.ConvertSuccess(
+                            ConvertResponse(
+                                date = null,
+                                result = convertedAmount,
+                                success = null,
+                                query = null,
+                                info = null
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -125,7 +133,7 @@ class ConvertCurrencyViewModel @Inject constructor(
         refreshLatestDateJob = viewModelScope.launch {
                 while (true) {
                     getLastFetchDate()
-                    delay( 60 * 1000L) // Delay for 60 seconds
+                    delay( 60 * 1000L)
                 }
         }
     }
