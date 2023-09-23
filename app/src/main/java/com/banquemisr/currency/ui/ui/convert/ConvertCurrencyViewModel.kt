@@ -12,10 +12,13 @@ import com.banquemisr.currency.ui.domain.usecase.symbols.SymbolsUseCase
 import com.banquemisr.currency.ui.data.ConvertParams
 import com.banquemisr.currency.ui.data.ConvertResponse
 import com.banquemisr.currency.ui.data.SymbolsParams
+import com.banquemisr.currency.ui.db.DataStoreManager
+import com.banquemisr.currency.ui.network.ApiResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.internal.cache2.Relay.Companion.edit
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -23,11 +26,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ConvertCurrencyViewModel @Inject constructor(
-    private val ratesUseCase: ExchangeRatesUseCase,
+    private val exchangeRatesUseCase: ExchangeRatesUseCase,
     private val symbolsUseCase: SymbolsUseCase,
-    private val convertUseCase: ConvertUseCase
-) : ViewModel() {
-
+    private val dataStoreManager: DataStoreManager,
+    private val convertUseCase: ConvertUseCase) : ViewModel()
+{
     private val _convertCurrencyState = MutableStateFlow<ConvertCurrencyState>(ConvertCurrencyState.Loading)
     val convertCurrencyState: StateFlow<ConvertCurrencyState> = _convertCurrencyState
 
@@ -43,20 +46,39 @@ class ConvertCurrencyViewModel @Inject constructor(
     var exchangeRates: ExchangeRates? = null
 
     init {
+        getLastFetchDate()
         fetchLatestRates()
     }
 
     private fun fetchLatestRates() {
 
         viewModelScope.launch {
-            _convertCurrencyState.value = ConvertCurrencyState.Loading
-            exchangeRates = ratesUseCase.invoke(
-                LatestParams(
-                accessKey = BuildConfig.API_ACCESS_KEY,
-                base = null,
-                symbols = null
-            )
-            )
+
+            when (val result = exchangeRatesUseCase(LatestParams(accessKey = BuildConfig.API_ACCESS_KEY, base = null, symbols = null))) {
+                is ApiResult.Success -> {
+                    exchangeRates = result.data
+                }
+                is ApiResult.Error -> {
+                    val exception = result.exception
+                    // Handle error
+                }
+            }
+        }
+    }
+
+    suspend fun saveLastFetchDate() {
+        dataStoreManager.setLastFetchDate(getCurrentDate(), viewModelScope)
+    }
+
+    private fun getLastFetchDate() {
+        val fetchedDate = dataStoreManager.getLastFetchDate()
+        "${fetchedDate.toString()}".showLogMessage()
+
+        if (fetchedDate.isNullOrEmpty()) {
+            "fetched date is empty".showLogMessage()
+        } else {
+            "fetched date = ${fetchedDate}".showLogMessage()
+
         }
     }
 

@@ -2,9 +2,9 @@ package com.banquemisr.currency.ui.di
 
 import com.banquemisr.currency.ui.data.CurrencyLocalDataSourceRepoImpl
 import com.banquemisr.currency.ui.data.ICurrencyLocalDataSourceRepo
-import com.banquemisr.currency.ui.data.IMoviesIRemoteDataSourceRepo
-import com.banquemisr.currency.ui.data.MoviesWebServices
-import com.banquemisr.currency.ui.data.RemoteDataSourceRepoImpl
+import com.banquemisr.currency.ui.data.ICurrencyRemoteDataSourceRepo
+import com.banquemisr.currency.ui.data.CurrencyWebServices
+import com.banquemisr.currency.ui.data.CurrencyRemoteDataSourceRepoImpl
 import com.banquemisr.currency.ui.db.CurrencyDao
 import com.banquemisr.currency.ui.domain.repository.ICurrencyRepository
 import com.banquemisr.currency.ui.domain.repository.CurrencyRepositoryImpl
@@ -20,7 +20,7 @@ class RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideRemoteDataSourceRepo(apiInterface: MoviesWebServices): IMoviesIRemoteDataSourceRepo = RemoteDataSourceRepoImpl(apiInterface)
+    fun provideRemoteDataSourceRepo(apiInterface: CurrencyWebServices): ICurrencyRemoteDataSourceRepo = CurrencyRemoteDataSourceRepoImpl(apiInterface)
 
 
     @Singleton
@@ -30,6 +30,6 @@ class RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideMoviesRepository(remoteDataSource: RemoteDataSourceRepoImpl): ICurrencyRepository = CurrencyRepositoryImpl(remoteDataSource)
-
+    fun provideMoviesRepository(localDataSource: CurrencyLocalDataSourceRepoImpl, remoteDataSource: CurrencyRemoteDataSourceRepoImpl) :
+            ICurrencyRepository = CurrencyRepositoryImpl(localDataSource, remoteDataSource)
 }

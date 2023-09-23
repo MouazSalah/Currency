@@ -3,7 +3,7 @@ package com.banquemisr.currency.ui.di
 import android.content.Context
 import com.banquemisr.currency.BuildConfig
 import com.banquemisr.currency.ui.network.MovieInterceptor
-import com.banquemisr.currency.ui.data.MoviesWebServices
+import com.banquemisr.currency.ui.data.CurrencyWebServices
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import dagger.Module
@@ -66,8 +66,8 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideAuthApiService(@DIAnnotation.MoviesRetrofit retrofit: Retrofit): MoviesWebServices = retrofit.create(
-        MoviesWebServices::class.java)
+    fun provideAuthApiService(@DIAnnotation.MoviesRetrofit retrofit: Retrofit): CurrencyWebServices = retrofit.create(
+        CurrencyWebServices::class.java)
 
 
     @DIAnnotation.MoviesInterceptor

@@ -139,5 +139,8 @@ android {
         // Room
         implementation("androidx.room:room-ktx:2.5.2")
         ksp("androidx.room:room-compiler:2.5.2")
+
+        // Data Store
+        implementation("androidx.datastore:datastore-preferences:1.0.0")
     }
 }
