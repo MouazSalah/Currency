@@ -9,11 +9,13 @@ import com.banquemisr.currency.ui.data.api.ICurrencyRemoteDataSourceRepo
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesApiModel
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesEntity
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesUIModel
+import com.banquemisr.currency.ui.data.model.symbols.Symbols
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsResponse
 import com.banquemisr.currency.ui.domain.mapper.ExchangeRatesMapper
 import com.banquemisr.currency.ui.extesnion.isNetworkAvailable
 import com.banquemisr.currency.ui.network.ApiResult
+import java.util.Locale
 import javax.inject.Inject
 
 class CurrencyRepositoryImpl @Inject constructor(
@@ -135,9 +137,30 @@ class CurrencyRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun getSymbols(params: SymbolsParams): SymbolsResponse {
-        return remoteDataSource.getSymbols(params)
+    override suspend fun getSymbols(params: SymbolsParams): List<String> {
+        val symbolsResponse = remoteDataSource.getSymbols(params)
+        return getCurrencySymbols(symbolsResponse.symbols ?: Symbols())
     }
+
+    private fun getCurrencySymbols(symbols: Symbols): List<String> {
+        var currencySymbols = mutableListOf<String>()
+
+        currencySymbols = symbols.javaClass.declaredFields
+            .map { it.name }
+            .map { it.substring(0, 3) }
+            .map { it.toUpperCase() }.toMutableList()
+
+//        for (field in fields) {
+//            field.isAccessible = true
+//            val symbol = field.get(symbols) as? String
+//            symbol?.let {
+//                currencySymbols.add(it.uppercase(Locale.ROOT))
+//            }
+//        }
+
+        return currencySymbols
+    }
+
 
     override suspend fun convertAmount(params: ConvertParams): ConvertResponse {
         return remoteDataSource.convertAmount(params)

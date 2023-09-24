@@ -1,10 +1,13 @@
 package com.banquemisr.currency.ui.ui.convert
 
+import android.app.Activity
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +20,7 @@ import com.banquemisr.currency.ui.extesnion.getMostCommonCurrencies
 import com.banquemisr.currency.ui.extesnion.showLogMessage
 import com.banquemisr.currency.ui.ui.base.BaseFragment
 import com.banquemisr.currency.ui.ui.base.MainActivity
+import com.banquemisr.currency.ui.ui.nointernet.NoInternetActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -26,6 +30,15 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
     private val viewModel : ConvertCurrencyViewModel by viewModels()
     override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentConvertCurrencyBinding {
         return FragmentConvertCurrencyBinding.inflate(inflater, container, false)
+    }
+
+    private val noInternetForResultActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            "get result activity".showLogMessage()
+
+            viewModel.fetchLatestRates()
+            viewModel.startRepeatingTask()
+        }
     }
 
     override fun onFragmentReady() {
@@ -42,12 +55,12 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
 
             val fromCurrenciesList : ArrayList<String> = getMostCommonCurrencies()
             fromCurrenciesList.add(0, "From")
+            spinnerYearsFrom.setItems(fromCurrenciesList)
 
             val toCurrenciesList : ArrayList<String> = getMostCommonCurrencies()
             toCurrenciesList.add(0, "To")
-
-            spinnerYearsFrom.setItems(fromCurrenciesList)
             spinnerYearsTo.setItems(toCurrenciesList)
+
 
             spinnerYearsFrom.apply {
 
@@ -227,9 +240,9 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
 
                     is ConvertCurrencyState.SymbolsSuccess -> {
 
-                        val symbols = state.symbolsResponse.symbols
-
-                        val currenciesList = arrayListOf("EGP" , "USD" , "GHD", "FGD", "EUR")
+//                        val fromCurrenciesList : ArrayList<String> = getMostCommonCurrencies()
+//                        fromCurrenciesList.add(0, "From")
+//                        binding.spinnerYearsFrom.setItems(state.symbols)
                     }
 
                     is ConvertCurrencyState.SymbolsError -> {
@@ -260,11 +273,18 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                     }
 
                     is ConvertCurrencyState.ApiError -> {
-
+                        "fragment api error".showLogMessage()
                         Toast.makeText(requireContext(), "api error", Toast.LENGTH_SHORT).show()
+
                     }
                     ConvertCurrencyState.InternetError -> {
+                        "fragment internet error".showLogMessage()
                         Toast.makeText(requireContext(), "internet connection !", Toast.LENGTH_SHORT).show()
+
+                        "heyyyyyyy".showLogMessage()
+
+                        val intent = Intent(requireActivity(), NoInternetActivity::class.java)
+                        noInternetForResultActivity.launch(intent)
                     }
                 }
             }

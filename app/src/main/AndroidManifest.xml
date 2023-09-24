@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
-        android:name="com.banquemisr.currency.ui.core.BaseApp"
+        android:name=".ui.core.BaseApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -18,9 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Currency"
         tools:targetApi="31">
-
         <activity
-            android:name="com.banquemisr.currency.ui.ui.splash.SplashActivity"
+            android:name=".ui.ui.nointernet.NoInternetActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.ui.splash.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,12 +30,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name="com.banquemisr.currency.ui.ui.base.MainActivity"
+            android:name=".ui.ui.base.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Currency" />
-
     </application>
 
 </manifest>

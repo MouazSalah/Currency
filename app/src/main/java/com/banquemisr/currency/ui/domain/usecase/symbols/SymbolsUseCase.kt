@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class SymbolsUseCase @Inject constructor(private val repository: ICurrencyRepository) {
 
-    suspend operator fun invoke(params: SymbolsParams): SymbolsResponse {
+    suspend operator fun invoke(params: SymbolsParams): List<String> {
 
         return repository.getSymbols(params)
     }

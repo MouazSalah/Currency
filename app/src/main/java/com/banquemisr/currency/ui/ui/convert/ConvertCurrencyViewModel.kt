@@ -1,6 +1,5 @@
 package com.banquemisr.currency.ui.ui.convert
 
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banquemisr.currency.BuildConfig
@@ -10,12 +9,13 @@ import com.banquemisr.currency.ui.domain.usecase.rates.ExchangeRatesUseCase
 import com.banquemisr.currency.ui.data.model.convert.ConvertParams
 import com.banquemisr.currency.ui.data.model.convert.ConvertResponse
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesUIModel
+import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
 import com.banquemisr.currency.ui.db.DataStoreManager
+import com.banquemisr.currency.ui.domain.usecase.symbols.SymbolsUseCase
 import com.banquemisr.currency.ui.extesnion.getCurrentTimeInMilliSeconds
 import com.banquemisr.currency.ui.extesnion.showLogMessage
 import com.banquemisr.currency.ui.extesnion.toFormattedDate
 import com.banquemisr.currency.ui.network.ApiResult
-import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -27,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ConvertCurrencyViewModel @Inject constructor(
     private val exchangeRatesUseCase: ExchangeRatesUseCase,
+    private val symbolsUseCase: SymbolsUseCase,
     private val dataStoreManager: DataStoreManager) : ViewModel()
 {
     private val _convertCurrencyState = MutableStateFlow<ConvertCurrencyState>(ConvertCurrencyState.Loading(false))
@@ -43,9 +44,22 @@ class ConvertCurrencyViewModel @Inject constructor(
     var inputSource : InputValueSource = InputValueSource.FROM
     private var exchangeRates: ExchangeRatesUIModel? = null
 
+    var symbolsList = ArrayList<String>()
+
     init {
         fetchLatestRates()
         startRepeatingTask()
+    }
+
+    private fun fetchAllSymbols() {
+
+        viewModelScope.launch {
+            val result = symbolsUseCase(SymbolsParams(accessKey = BuildConfig.API_ACCESS_KEY, format = 1))
+            symbolsList.addAll(result)
+            "symbols size = ${result.size}".showLogMessage()
+
+            _convertCurrencyState.value = ConvertCurrencyState.SymbolsSuccess(symbolsList)
+        }
     }
 
     fun fetchLatestRates() {
@@ -61,10 +75,12 @@ class ConvertCurrencyViewModel @Inject constructor(
                 }
                 is ApiResult.ApiError -> {
                     val exception = result.exception
+                    "viewModel api error = ${exception.toString()}".showLogMessage()
                     _convertCurrencyState.value = ConvertCurrencyState.ApiError( "")
                 }
                 is ApiResult.InternetError -> {
                     val exception = result.exception
+                    "viewModel internet error = ${exception.toString()}".showLogMessage()
                     _convertCurrencyState.value = ConvertCurrencyState.InternetError
                 }
                 is ApiResult.CashedData -> {
@@ -128,7 +144,7 @@ class ConvertCurrencyViewModel @Inject constructor(
         return "${lastFetchedDate.toFormattedDate()} - ${TimeAgo.getTimeAgo(lastFetchedDate)}"
     }
 
-    private fun startRepeatingTask() {
+    fun startRepeatingTask() {
 
         refreshLatestDateJob = viewModelScope.launch {
                 while (true) {

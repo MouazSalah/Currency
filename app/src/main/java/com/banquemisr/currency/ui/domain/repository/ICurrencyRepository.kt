@@ -19,7 +19,7 @@ interface ICurrencyRepository {
     suspend fun insertExchangeRatesToRoom(exchangeRates: ExchangeRatesApiModel)
 
 
-    suspend fun getSymbols(params : SymbolsParams): SymbolsResponse
+    suspend fun getSymbols(params : SymbolsParams): List<String>
 
     suspend fun convertAmount(params : ConvertParams): ConvertResponse
 }
