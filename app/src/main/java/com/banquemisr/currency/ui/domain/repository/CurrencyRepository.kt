@@ -6,6 +6,8 @@ import com.banquemisr.currency.ui.data.model.convert.ConvertParams
 import com.banquemisr.currency.ui.data.model.convert.ConvertResponse
 import com.banquemisr.currency.ui.data.datasource.ICurrencyLocalDataSourceRepo
 import com.banquemisr.currency.ui.data.api.ICurrencyRemoteDataSourceRepo
+import com.banquemisr.currency.ui.data.model.history.HistoricalRatesParams
+import com.banquemisr.currency.ui.data.model.history.HistoryRateResponse
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesApiModel
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesEntity
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesUIModel
@@ -55,6 +57,10 @@ class CurrencyRepositoryImpl @Inject constructor(
                 ApiResult.CashedData(it)
             } ?: ApiResult.InternetError("No internet connection")
         }
+    }
+
+    override suspend fun getHistoricalRates(params: HistoricalRatesParams): ApiResult<HistoryRateResponse> {
+        TODO("Not yet implemented")
     }
 
 //    override suspend fun getExchangeRatesFromApi(params: ExchangeRatesParams): ApiResult<ExchangeRatesUIModel> {

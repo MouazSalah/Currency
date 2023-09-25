@@ -4,6 +4,8 @@ import com.banquemisr.currency.ui.data.api.CurrencyWebServices
 import com.banquemisr.currency.ui.data.api.ICurrencyRemoteDataSourceRepo
 import com.banquemisr.currency.ui.data.model.convert.ConvertParams
 import com.banquemisr.currency.ui.data.model.convert.ConvertResponse
+import com.banquemisr.currency.ui.data.model.history.HistoricalRatesParams
+import com.banquemisr.currency.ui.data.model.history.HistoryRateResponse
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesApiModel
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesParams
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
@@ -18,6 +20,10 @@ class CurrencyRemoteDataSourceRepoImpl @Inject constructor(private val apiInterf
 
     override suspend fun getExchangeRates(params: ExchangeRatesParams): Response<ExchangeRatesApiModel> {
         return apiInterface.getExchangeRates(params.toHashMapParams()!!)
+    }
+
+    override suspend fun getHistoricalRates(params: HistoricalRatesParams): Response<HistoryRateResponse> {
+        return apiInterface.getHistoricalRates(params.toHashMapParams()!!)
     }
 
     override suspend fun getSymbols(params: SymbolsParams): SymbolsResponse {
