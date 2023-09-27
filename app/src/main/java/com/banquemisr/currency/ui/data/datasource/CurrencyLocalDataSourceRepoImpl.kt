@@ -11,8 +11,4 @@ class CurrencyLocalDataSourceRepoImpl @Inject constructor(private val currencyDa
     override suspend fun loadExchangeRates(): ExchangeRatesEntity? = currencyDao.getExchangeRates()
 
     override suspend fun insertExchangeRates(exchangeRates: ExchangeRatesEntity) = currencyDao.insertExchangeRates(exchangeRates)
-//    override suspend fun loadCurrencies(): CurrencyEntity?  = currencyDao.getCurrencies()
-//
-//    override suspend fun insertCurrencies(currencies: CurrencyEntity) = currencyDao.insertCurrencies(currencies)
-
 }

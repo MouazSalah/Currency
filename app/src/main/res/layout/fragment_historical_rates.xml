@@ -11,7 +11,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/_8sdp"
+        android:paddingBottom="@dimen/_16sdp"
+        android:paddingHorizontal="@dimen/_8sdp"
         android:background="@color/white">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -29,91 +30,12 @@
             tools:itemCount="3"
             tools:listitem="@layout/item_historical_rate_exchange_rate" />
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/line_chart"
-            android:layout_marginTop="@dimen/_40sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rv_historical_rates"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_200sdp" />
-
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/bar_charts"
             android:layout_marginTop="@dimen/_40sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/line_chart"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_200sdp"
-            android:background="@android:color/white"/>
-
-        <com.github.mikephil.charting.charts.BubbleChart
-            android:id="@+id/bubble_charts"
-            android:layout_marginTop="@dimen/_40sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bar_charts"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_200sdp"
-            android:background="@android:color/white"/>
-
-        <com.github.mikephil.charting.charts.CandleStickChart
-            android:id="@+id/candles_charts"
-            android:layout_marginTop="@dimen/_40sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bubble_charts"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_200sdp"
-            android:background="@android:color/white"/>
-
-        <com.github.mikephil.charting.charts.CombinedChart
-            android:id="@+id/combined_charts"
-            android:layout_marginTop="@dimen/_40sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/candles_charts"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_200sdp"
-            android:background="@android:color/white"/>
-
-        <com.github.mikephil.charting.charts.HorizontalBarChart
-            android:id="@+id/horizontal_charts"
-            android:layout_marginTop="@dimen/_40sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/combined_charts"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_200sdp"
-            android:background="@android:color/white"/>
-
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/pie_charts"
-            android:layout_marginTop="@dimen/_40sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/combined_charts"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_200sdp"
-            android:background="@android:color/white"/>
-
-        <com.github.mikephil.charting.charts.RadarChart
-            android:id="@+id/redar_charts"
-            android:layout_marginTop="@dimen/_40sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pie_charts"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_200sdp"
-            android:background="@android:color/white"/>
-
-        <com.github.mikephil.charting.charts.ScatterChart
-            android:id="@+id/scatter_charts"
-            android:layout_marginTop="@dimen/_40sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/redar_charts"
+            app:layout_constraintTop_toBottomOf="@+id/rv_historical_rates"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_200sdp"
             android:background="@android:color/white"/>

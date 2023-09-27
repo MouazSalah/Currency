@@ -6,7 +6,6 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
@@ -18,8 +17,6 @@ import com.banquemisr.currency.databinding.FragmentConvertCurrencyBinding
 import com.banquemisr.currency.ui.extesnion.afterTextChanged
 import com.banquemisr.currency.ui.extesnion.castToActivity
 import com.banquemisr.currency.ui.extesnion.formatAmount
-import com.banquemisr.currency.ui.extesnion.getMostCommonCurrencies
-import com.banquemisr.currency.ui.extesnion.showLogMessage
 import com.banquemisr.currency.ui.ui.apierror.BottomSheetServerError
 import com.banquemisr.currency.ui.ui.base.BaseFragment
 import com.banquemisr.currency.ui.ui.base.MainActivity
@@ -31,14 +28,15 @@ import kotlinx.coroutines.launch
 class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
 {
     private val viewModel : ConvertCurrencyViewModel by viewModels()
+    var countDownTimer: CountDownTimer? = null
+    val totalTimeInMilliseconds = 60000 // 10 seconds
+
     override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentConvertCurrencyBinding {
         return FragmentConvertCurrencyBinding.inflate(inflater, container, false)
     }
 
     private val noInternetForResultActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            "get result activity".showLogMessage()
-
             viewModel.fetchLatestRates()
             viewModel.startRepeatingTask()
         }
@@ -50,36 +48,47 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
         initObservers()
         initCurrenciesViews()
         initAmountViews()
+        initCountDownTimer()
+    }
 
-//        val totalTimeInMilliseconds = 60000 // 10 seconds
-//        val countdownTimer = object : CountDownTimer(totalTimeInMilliseconds.toLong(), 1000) {
-//            override fun onTick(millisUntilFinished: Long) {
-//                val progress = 100 - ((millisUntilFinished * 100) / totalTimeInMilliseconds)
-//                binding.circularCountdownView.setProgress(progress.toFloat())
-//                binding.circularCountdownView.timeLeft = (millisUntilFinished / 1000).toInt()
-//            }
-//
-//            override fun onFinish() {
-//                binding.circularCountdownView.setProgress(100f)
-//                binding.circularCountdownView.timeLeft = 0
-//            }
-//        }
-//        countdownTimer.start()
+    private fun initCountDownTimer() {
+        countDownTimer = object : CountDownTimer(totalTimeInMilliseconds.toLong(), 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val progress = 100 - ((millisUntilFinished * 100) / totalTimeInMilliseconds)
+                binding.circularCountdownView.setProgress(progress.toFloat())
+                binding.circularCountdownView.timeLeft = (millisUntilFinished / 1000).toInt()
+            }
+
+            override fun onFinish() {
+                binding.circularCountdownView.setProgress(100f)
+                binding.circularCountdownView.timeLeft = 0
+
+                binding.circularCountdownView.isVisible = false
+                binding.refreshIcon.isVisible = true
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding.etPriceFrom.text = null
+        binding.etPriceTo.text = null
+        viewModel.apply {
+            fetchAllSymbols()
+            fetchLatestRates()
+            startRepeatingTask()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        countDownTimer?.cancel()
     }
 
 
     private fun initCurrenciesViews() {
 
         binding.apply {
-
-            val fromCurrenciesList : ArrayList<String> = getMostCommonCurrencies()
-            fromCurrenciesList.add(0, "From")
-            spinnerYearsFrom.setItems(fromCurrenciesList)
-
-            val toCurrenciesList : ArrayList<String> = getMostCommonCurrencies()
-            toCurrenciesList.add(0, "To")
-            spinnerYearsTo.setItems(toCurrenciesList)
-
 
             spinnerYearsFrom.apply {
 
@@ -91,26 +100,18 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                     when {
                         selectedIndex != 0 -> {
                             hint = item
-                            viewModel.convertParams.currencyFrom = item
-                            viewModel.sourceCurrency = item
+                            viewModel.convertParams.sourceCurrency = item
                             checkIfBothCurrenciesAndAmountAreSelected()
                         }
                         else -> {
                             text = null
                             hint = "From"
 
-                            "before reset from sourceCurrency : ${viewModel.sourceCurrency}".showLogMessage()
-                            "before reset from destinationCurrency : ${viewModel.destinationCurrency}".showLogMessage()
-
-                            viewModel.convertParams.currencyFrom = null
-                            viewModel.sourceCurrency = null
+                            viewModel.convertParams.sourceCurrency = null
 
                             viewModel.isSettingTextProgrammatically = true
                             etPriceTo.text = null
                             viewModel.isSettingTextProgrammatically = false
-
-                            "after reset from sourceCurrency : ${viewModel.sourceCurrency}".showLogMessage()
-                            "after reset from destinationCurrency : ${viewModel.destinationCurrency}".showLogMessage()
                         }
                     }
                 }
@@ -126,26 +127,17 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                     when {
                         selectedIndex != 0 -> {
                             hint = item
-                            viewModel.convertParams.currencyTo = item
-                            viewModel.destinationCurrency = item
+                            viewModel.convertParams.destinationCurrency = item
                             checkIfBothCurrenciesAndAmountAreSelected()
                         }
                         else -> {
-
-                            "before reset to sourceCurrency : ${viewModel.sourceCurrency}".showLogMessage()
-                            "before reset to destinationCurrency : ${viewModel.destinationCurrency}".showLogMessage()
-
                             text = null
                             hint = "To"
-                            viewModel.convertParams.currencyTo = null
-                            viewModel.destinationCurrency = null
+                            viewModel.convertParams.destinationCurrency = null
 
                             viewModel.isSettingTextProgrammatically = true
                             binding.etPriceTo.text = null
                             viewModel.isSettingTextProgrammatically = false
-
-                            "after reset to sourceCurrency : ${viewModel.sourceCurrency}".showLogMessage()
-                            "after reset to destinationCurrency : ${viewModel.destinationCurrency}".showLogMessage()
                         }
                     }
                 }
@@ -155,12 +147,8 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
 
     private fun checkIfBothCurrenciesAndAmountAreSelected() {
 
-        "sourceCurrency : ${viewModel.sourceCurrency}".showLogMessage()
-        "destinationCurrency : ${viewModel.destinationCurrency}".showLogMessage()
-        "amount : ${viewModel.convertParams.amount}".showLogMessage()
-
         binding.apply {
-            if (viewModel.sourceCurrency != null && viewModel.destinationCurrency != null && viewModel.convertParams.amount != null) {
+            if (viewModel.convertParams.sourceCurrency != null && viewModel.convertParams.destinationCurrency != null && viewModel.convertParams.amount != null) {
                 viewModel.convertAmount()
             }
         }
@@ -195,42 +183,13 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
 
             etPriceFrom.afterTextChanged {
 
-                "etPriceFrom afterTextChanged".showLogMessage()
-
                 if (!viewModel.isSettingTextProgrammatically) {
                     if (it.isBlank() || it.isEmpty()) {
                         viewModel.convertParams.amount = null
                     } else {
                         viewModel.convertParams.amount = it.replace(",", "").toDoubleOrNull() ?: 0.0
 
-                        viewModel.inputSource = InputValueSource.FROM
-
-                        if (viewModel.sourceCurrency != null && viewModel.destinationCurrency != null) {
-                            viewModel.convertParams.currencyFrom = viewModel.sourceCurrency
-                            viewModel.convertParams.currencyTo = viewModel.destinationCurrency
-
-                            viewModel.convertAmount()
-                        }
-                    }
-                }
-            }
-
-            etPriceTo.afterTextChanged {
-
-                "etPriceTo afterTextChanged".showLogMessage()
-
-                if (!viewModel.isSettingTextProgrammatically) {
-                    if (it.isBlank() || it.isEmpty()) {
-                        viewModel.convertParams.amount = null
-                    } else {
-                        viewModel.convertParams.amount = it.replace(",", "").toDoubleOrNull() ?: 0.0
-
-                        viewModel.inputSource = InputValueSource.TO
-
-                        if (viewModel.sourceCurrency != null && viewModel.destinationCurrency != null) {
-                            viewModel.sourceCurrency = viewModel.destinationCurrency.also {
-                                viewModel.destinationCurrency = viewModel.sourceCurrency
-                            }
+                        if (viewModel.convertParams.sourceCurrency != null && viewModel.convertParams.destinationCurrency != null) {
                             viewModel.convertAmount()
                         }
                     }
@@ -251,55 +210,37 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                             it?.showProgress(state.isShow)
                         }
                     }
-
                     is ConvertCurrencyState.LatestFetchDate -> {
+                        binding.refreshIcon.isVisible = false
+                        binding.circularCountdownView.isVisible = true
+                        countDownTimer?.cancel()
+                        countDownTimer?.start()
+
                         binding.layoutLatestDate.isVisible = true
                         "Last Update:  ${state.date}".also { binding.textLatestDate.text = it }
+                        state.timeAgo.also { binding.tvTimeAgo.text = it }
                     }
-
                     is ConvertCurrencyState.SymbolsSuccess -> {
 
-//                        val fromCurrenciesList : ArrayList<String> = getMostCommonCurrencies()
-//                        fromCurrenciesList.add(0, "From")
-//                        binding.spinnerYearsFrom.setItems(state.symbols)
-                    }
+                        val fromCurrenciesList : ArrayList<String> = ArrayList()
+                        fromCurrenciesList.add(0, "From")
+                        fromCurrenciesList.addAll(state.symbols)
+                        binding.spinnerYearsFrom.setItems(fromCurrenciesList)
 
-                    is ConvertCurrencyState.SymbolsError -> {
-                        val errorMessage = state.errorMessage
-                        "symbols error message : ${errorMessage.toString()} ".showLogMessage()
+                        val toCurrenciesList : ArrayList<String> = ArrayList()
+                        toCurrenciesList.add(0, "To")
+                        toCurrenciesList.addAll(state.symbols)
+                        binding.spinnerYearsTo.setItems(toCurrenciesList)
                     }
-
-                    is ConvertCurrencyState.ConvertError -> {
-                        val errorMessage = state.errorMessage
-                        "convert error message : ${errorMessage.toString()} ".showLogMessage()
-                    }
-
                     is ConvertCurrencyState.ConvertSuccess -> {
-                        "convert response observe".showLogMessage()
                         viewModel.isSettingTextProgrammatically = true
-                        when (viewModel.inputSource) {
-                            InputValueSource.FROM -> {
-                                binding.etPriceTo.setText(formatAmount(state.convertResponse.result ?: 0.0))
-                            }
-                            else -> {
-                                viewModel.sourceCurrency = viewModel.destinationCurrency.also {
-                                    viewModel.destinationCurrency = viewModel.sourceCurrency
-                                }
-                                binding.etPriceFrom.setText(formatAmount(state.convertResponse.result ?: 0.0))
-                            }
-                        }
+                        binding.etPriceTo.setText(formatAmount(state.convertResponse.result ?: 0.0))
                         viewModel.isSettingTextProgrammatically = false
                     }
-
                     is ConvertCurrencyState.ApiError -> {
                         BottomSheetServerError().show(requireActivity().supportFragmentManager, null)
                     }
                     ConvertCurrencyState.InternetError -> {
-                        "fragment internet error".showLogMessage()
-                        Toast.makeText(requireContext(), "internet connection !", Toast.LENGTH_SHORT).show()
-
-                        "heyyyyyyy".showLogMessage()
-
                         val intent = Intent(requireActivity(), NoInternetActivity::class.java)
                         noInternetForResultActivity.launch(intent)
                     }
@@ -322,10 +263,6 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
 
             icSwitch.setOnClickListener {
 
-                etPriceFrom.text = etPriceTo.text.also {
-                    etPriceTo.text = etPriceFrom.text
-                }
-
                 val tempIndex = spinnerYearsFrom.selectedIndex
                 spinnerYearsFrom.selectItemByIndex(spinnerYearsTo.selectedIndex)
                 spinnerYearsTo.selectItemByIndex(tempIndex)
@@ -344,7 +281,7 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
 
                 it?.mBinding?.apply {
                     clToolbar.isVisible = true
-                    tvTitle.text = "Movies"
+                    tvTitle.text = "Currency"
                     btnBack.isVisible = false
                 }
             }

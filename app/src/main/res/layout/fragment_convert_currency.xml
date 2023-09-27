@@ -130,7 +130,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/_12ssp"
-            android:layout_marginTop="@dimen/_10sdp"
             android:text="Amount"
             android:textColor="@color/color_red"
             android:id="@+id/text_price"
@@ -181,12 +180,13 @@
                 android:imeOptions="actionNext"
                 android:textAlignment="viewStart"
                 tools:text="50000"
+                android:enabled="false"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:digits="1234567890٠١٢٣٤٥٦٧٨٩"
-                android:inputType="phone" />
+                android:inputType="none" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -204,14 +204,6 @@
         app:layout_constraintTop_toBottomOf="@+id/layout_amount"
         android:padding="@dimen/_8sdp">
 
-        <ImageView
-            android:id="@+id/refresh_icon"
-            android:layout_width="@dimen/_24sdp"
-            android:layout_height="@dimen/_24sdp"
-            android:src="@drawable/ic_refresh"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="@dimen/_8sdp"
-            app:tint="@color/color_primary" />
 
         <TextView
             android:id="@+id/text_latest_date"
@@ -223,16 +215,42 @@
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
-    <com.banquemisr.currency.ui.ui.customviews.CircularCountdownView
-        android:id="@+id/circularCountdownView"
-        android:layout_width="@dimen/_40sdp"
-        android:layout_height="@dimen/_40sdp"
-        android:padding="@dimen/_2sdp"
-        android:layout_marginTop="@dimen/_24sdp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_latest_date" />
+    <LinearLayout
+        android:id="@+id/layout_refresh_rates"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/_16sdp"
+        app:layout_constraintTop_toBottomOf="@+id/layout_latest_date"
+        android:padding="@dimen/_8sdp">
 
+        <com.banquemisr.currency.ui.ui.customviews.CircularCountdownView
+            android:id="@+id/circularCountdownView"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:padding="@dimen/_2sdp" />
+
+        <ImageView
+            android:id="@+id/refresh_icon"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:visibility="gone"
+            android:src="@drawable/ic_refresh"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="@dimen/_8sdp"
+            app:tint="@color/color_primary" />
+
+        <TextView
+            android:id="@+id/tv_time_ago"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_12sdp"
+            android:layout_marginStart="@dimen/_8sdp"
+            tools:text="two minutes ago"
+            android:textColor="@color/color_primary"
+            android:layout_gravity="center_vertical"/>
+    </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_ok"
@@ -241,7 +259,7 @@
         android:layout_height="wrap_content"
         android:textAllCaps="false"
         android:fontFamily="@font/roboto_bold"
-        app:layout_constraintTop_toBottomOf="@+id/circularCountdownView"
+        app:layout_constraintTop_toBottomOf="@+id/layout_refresh_rates"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:strokeColor="@color/color_bank_masr"

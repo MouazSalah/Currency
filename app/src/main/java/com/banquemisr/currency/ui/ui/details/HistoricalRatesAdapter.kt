@@ -20,8 +20,7 @@ class HistoricalRatesAdapter : BaseAdapter<ViewBinding, Any>(BaseDiffCallback())
     override fun getItemViewType(position: Int): Int {
         return when (val item = getItem(position)) {
             is String -> VIEW_TYPE_DATE
-            is HistoricalRate -> VIEW_TYPE_CURRENCY_RATE
-            else -> throw IllegalArgumentException("Invalid item type")
+            else -> VIEW_TYPE_CURRENCY_RATE
         }
     }
 

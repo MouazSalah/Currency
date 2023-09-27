@@ -11,9 +11,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class DataStoreManager @Inject constructor(val context: Context, val gson: Gson)
-{
-    private val Context.dataStore : DataStore<Preferences> by preferencesDataStore(name = "CURRENCY_PREF")
+class DataStoreManager @Inject constructor(val context: Context, val gson: Gson) {
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "CURRENCY_PREF")
 
     fun setLastFetchDate(
         date: Long?, coroutineScope: CoroutineScope,
@@ -82,6 +81,29 @@ class DataStoreManager @Inject constructor(val context: Context, val gson: Gson)
         }
     }
 
+    fun saveCurrenciesList(
+        list: List<String>,
+        coroutineScope: CoroutineScope,
+        callBack: (Boolean) -> Unit = {}
+    ) {
+        val jsonString = gson.toJson(list)
+        writePrefString(PreferenceKeys.CURRENCIES, jsonString, coroutineScope, callBack)
+    }
+
+    fun getCurrenciesList(): List<String> {
+        val jsonString = readPrefStringBlocking(PreferenceKeys.CURRENCIES)
+        return if (jsonString != null) {
+            try {
+                gson.fromJson(jsonString, Array<String>::class.java).toList()
+            } catch (e: Exception) {
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
+    }
+
+
     fun clearAllData(scope: CoroutineScope) {
         scope.launch {
             context.dataStore.edit {
@@ -102,4 +124,6 @@ class DataStoreManager @Inject constructor(val context: Context, val gson: Gson)
 
 object PreferenceKeys {
     val LAST_FETCH_RATES_DATE = longPreferencesKey("last_fetch_rates_date")
+    val CURRENCIES = stringPreferencesKey("CURRENCIES")
+
 }

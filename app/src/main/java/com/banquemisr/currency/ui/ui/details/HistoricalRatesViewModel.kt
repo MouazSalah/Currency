@@ -7,10 +7,11 @@ import com.banquemisr.currency.ui.data.model.history.HistoricalRatesParams
 import com.banquemisr.currency.ui.data.model.history.HistoryRateResponse
 import com.banquemisr.currency.ui.db.DataStoreManager
 import com.banquemisr.currency.ui.domain.usecase.history.HistoricalRatesUseCase
-import com.banquemisr.currency.ui.extesnion.showLogMessage
 import com.banquemisr.currency.ui.network.ApiResult
-import com.google.gson.annotations.SerializedName
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -33,23 +34,68 @@ class HistoricalRatesViewModel @Inject constructor(
     var historicalRateResponse: HistoryRateResponse? = null
 
     init {
-        getDaysDates()
+        getHistoricalDates()
         fetchHistoricalRates()
     }
 
-    fun getDaysDates(){
-        // Get today's date
+
+    private fun fetchHistoricalRates() {
+        viewModelScope.launch {
+
+            val yesterdayRatesDeferred = fetchHistoricalRatesAsync(historicalDates[0])
+            val dayBeforeYesterdayRatesDeferred = fetchHistoricalRatesAsync(historicalDates[1])
+            val dayBeforeBeforeYesterdayRatesDeferred = fetchHistoricalRatesAsync(historicalDates[2])
+
+            val yesterdayRates = yesterdayRatesDeferred
+            val dayBeforeYesterdayRates = dayBeforeYesterdayRatesDeferred
+            val dayBeforeBeforeYesterdayRates = dayBeforeBeforeYesterdayRatesDeferred
+
+            val desiredCurrencyCodes = getCurrentList()
+
+            if (yesterdayRates is ApiResult.Success) {
+                historicalRateResponse = yesterdayRates.data
+                val currencyRates = extractCurrencyRates(yesterdayRates.data, desiredCurrencyCodes)
+                historicalRates.add(historicalDates[0])
+                historicalRates.addAll(currencyRates)
+            }
+
+            if (dayBeforeYesterdayRates is ApiResult.Success) {
+                historicalRateResponse = dayBeforeYesterdayRates.data
+                val currencyRates = extractCurrencyRates(dayBeforeYesterdayRates.data, desiredCurrencyCodes)
+                historicalRates.add(historicalDates[1])
+                historicalRates.addAll(currencyRates)
+            }
+
+            if (dayBeforeBeforeYesterdayRates is ApiResult.Success) {
+                historicalRateResponse = dayBeforeBeforeYesterdayRates.data
+                val currencyRates = extractCurrencyRates(dayBeforeBeforeYesterdayRates.data, desiredCurrencyCodes)
+                historicalRates.add(historicalDates[2])
+                historicalRates.addAll(currencyRates)
+            }
+
+            _historicalRatesState.value = HistoricalRatesState.Success(historicalRates)
+        }
+    }
+
+    private suspend fun fetchHistoricalRatesAsync(date: String): ApiResult<HistoryRateResponse> {
+        return CoroutineScope(Dispatchers.IO).async {
+            historicalRatesUseCase(
+                HistoricalRatesParams(
+                    accessKey = BuildConfig.API_ACCESS_KEY,
+                    date = date
+                )
+            )
+        }.await()
+    }
+
+    private fun getHistoricalDates(){
         val today = LocalDate.now()
 
-        // Format the date in "yyyy-MM-dd" format
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val todayFormatted = today.format(dateFormatter)
 
-        // Get yesterday's date by subtracting one day
         val yesterday = today.minusDays(1)
         val yesterdayFormatted = yesterday.format(dateFormatter)
 
-        // Get the day before yesterday's date by subtracting two days
         val dayBeforeYesterday = today.minusDays(2)
         val dayBeforeYesterdayFormatted = dayBeforeYesterday.format(dateFormatter)
 
@@ -60,63 +106,10 @@ class HistoricalRatesViewModel @Inject constructor(
         historicalDates.add(yesterdayFormatted)
         historicalDates.add(dayBeforeYesterdayFormatted)
         historicalDates.add(dayBeforeBeforeYesterdayFormatted)
-
-
-        historicalCurrencies.clear()
-        historicalCurrencies.add("USD")
-        historicalCurrencies.add("AED")
-        historicalCurrencies.add("EGP")
-        historicalCurrencies.add("EUR")
-
-        // Print the dates
-        println("Today: $todayFormatted")
-        println("Yesterday: $yesterdayFormatted")
-        println("Day Before Yesterday: $dayBeforeYesterdayFormatted")
-        println("Day Before Before Yesterday: $dayBeforeBeforeYesterdayFormatted")
-    }
-
-    private fun fetchHistoricalRates() {
-
-        viewModelScope.launch {
-
-            val result = historicalRatesUseCase(
-                HistoricalRatesParams(
-                    accessKey = BuildConfig.API_ACCESS_KEY,
-                    date = "2023-09-23"
-                )
-            )
-
-            if (result is ApiResult.Success) {
-
-                historicalRateResponse = result.data
-                historicalRateResponse = result.data
-
-
-                val desiredCurrencyCodes = listOf("USD", "AED", "EGP", "EUR")
-                val currencyRates = extractCurrencyRates(result.data, desiredCurrencyCodes)
-
-                val date1 = "2023-09-23"
-                historicalRates.add(date1)
-                historicalRates.addAll(currencyRates)
-
-//                var date2 = "2023-09-24"
-//                historicalRates.add(date2)
-//                historicalRates.addAll(currencyRates)
-//
-//                var date3 = "2023-09-25"
-//                historicalRates.add(date3)
-//                historicalRates.addAll(currencyRates)
-
-                _historicalRatesState.value = HistoricalRatesState.Success(historicalRates)
-
-                "historical_rates = ${currencyRates.toString()}".showLogMessage()
-            }
-        }
     }
 
 
-    // Function to extract currency names and rates
-    private fun extractCurrencyRates(response: HistoryRateResponse, desiredCurrencyCodes: List<String>): List<HistoricalRate> {
+    private fun extractCurrencyRates(response: HistoryRateResponse, desiredCurrencyCodes: ArrayList<String>): List<HistoricalRate> {
         val currencyRates = mutableListOf<HistoricalRate>()
 
         for (currencyCode in desiredCurrencyCodes) {
@@ -124,7 +117,7 @@ class HistoricalRatesViewModel @Inject constructor(
             if (rate != null) {
                 val currencyName = response.rates.entries
                     .find { it.key == currencyCode }
-                    ?.key // Assuming the currency code is also the currency name
+                    ?.key
 
                 if (currencyName != null) {
                     currencyRates.add(HistoricalRate(currencyName, rate))
@@ -133,5 +126,13 @@ class HistoricalRatesViewModel @Inject constructor(
         }
 
         return currencyRates
+    }
+
+    private fun getCurrentList(): ArrayList<String> {
+
+        historicalCurrencies.clear()
+        historicalCurrencies.addAll(dataStoreManager.getCurrenciesList())
+
+        return historicalCurrencies
     }
 }

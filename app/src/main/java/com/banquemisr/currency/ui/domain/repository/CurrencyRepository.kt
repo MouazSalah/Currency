@@ -2,8 +2,6 @@ package com.banquemisr.currency.ui.domain.repository
 
 import com.banquemisr.currency.ui.core.BaseApp
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesParams
-import com.banquemisr.currency.ui.data.model.convert.ConvertParams
-import com.banquemisr.currency.ui.data.model.convert.ConvertResponse
 import com.banquemisr.currency.ui.data.datasource.ICurrencyLocalDataSourceRepo
 import com.banquemisr.currency.ui.data.api.ICurrencyRemoteDataSourceRepo
 import com.banquemisr.currency.ui.data.model.history.HistoricalRatesParams
@@ -13,7 +11,6 @@ import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesEntity
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesUIModel
 import com.banquemisr.currency.ui.data.model.symbols.Symbols
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
-import com.banquemisr.currency.ui.db.CurrencyEntity
 import com.banquemisr.currency.ui.domain.mapper.ExchangeRatesMapper
 import com.banquemisr.currency.ui.extesnion.isNetworkAvailable
 import com.banquemisr.currency.ui.network.ApiResult
@@ -110,19 +107,4 @@ class CurrencyRepositoryImpl @Inject constructor(
 
         return currencySymbols
     }
-
-
-    override suspend fun convertAmount(params: ConvertParams): ConvertResponse {
-        return remoteDataSource.convertAmount(params)
-    }
-
-//    override suspend fun getCurrencies(): ApiResult<CurrencyEntity> {
-//
-//        return localDataSourceRepo.loadCurrencies()?.let {
-//            ApiResult.CashedData(it)
-//        } ?: ApiResult.ApiError("No Currencies")
-//    }
-//
-//    override suspend fun insertCurrencies(currencies: CurrencyEntity) = localDataSourceRepo.insertCurrencies(currencies)
-
 }

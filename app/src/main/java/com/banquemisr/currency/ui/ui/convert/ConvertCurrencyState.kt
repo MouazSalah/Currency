@@ -7,10 +7,8 @@ sealed class ConvertCurrencyState {
     data class Loading(var isShow: Boolean) : ConvertCurrencyState()
     data class SymbolsSuccess(val symbols: List<String>) : ConvertCurrencyState()
     data class ConvertSuccess(val convertResponse: ConvertResponse) : ConvertCurrencyState()
-    data class SymbolsError(val errorMessage: String) : ConvertCurrencyState()
-    data class ConvertError(val errorMessage: String) : ConvertCurrencyState()
 
-    data class LatestFetchDate(val date: String) : ConvertCurrencyState()
+    data class LatestFetchDate(val date: String, val timeAgo: String) : ConvertCurrencyState()
 
     data class ApiError(val date: String) : ConvertCurrencyState()
     data object InternetError : ConvertCurrencyState()

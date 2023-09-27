@@ -17,7 +17,7 @@
         android:textSize="@dimen/_14ssp"
         android:id="@+id/tv_date"
         tools:text="2019-01-01"
-        android:textColor="@color/color_bank_masr"
+        android:textColor="@color/color_primary"
         android:fontFamily="@font/roboto_bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

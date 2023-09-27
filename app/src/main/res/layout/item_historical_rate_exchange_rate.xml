@@ -17,7 +17,7 @@
         android:textSize="@dimen/_12ssp"
         tools:text="USD"
         android:id="@+id/tv_currency_name"
-        android:textColor="@color/color_bank_masr"
+        android:textColor="@color/black"
         android:fontFamily="@font/roboto_regular"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

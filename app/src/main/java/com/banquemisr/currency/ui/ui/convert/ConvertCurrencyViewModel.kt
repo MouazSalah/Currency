@@ -4,15 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.banquemisr.currency.BuildConfig
 import com.banquemisr.currency.ui.core.TimeAgo
+import com.banquemisr.currency.ui.data.model.convert.ConvertParams
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesParams
 import com.banquemisr.currency.ui.domain.usecase.rates.ExchangeRatesUseCase
-import com.banquemisr.currency.ui.data.model.convert.ConvertParams
 import com.banquemisr.currency.ui.data.model.convert.ConvertResponse
-import com.banquemisr.currency.ui.data.model.history.HistoricalRatesParams
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesUIModel
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
 import com.banquemisr.currency.ui.db.DataStoreManager
-import com.banquemisr.currency.ui.domain.usecase.history.HistoricalRatesUseCase
 import com.banquemisr.currency.ui.domain.usecase.symbols.SymbolsUseCase
 import com.banquemisr.currency.ui.extesnion.getCurrentTimeInMilliSeconds
 import com.banquemisr.currency.ui.extesnion.showLogMessage
@@ -30,7 +28,6 @@ import javax.inject.Inject
 class ConvertCurrencyViewModel @Inject constructor(
     private val exchangeRatesUseCase: ExchangeRatesUseCase,
     private val symbolsUseCase: SymbolsUseCase,
-    private val historicalRatesUseCase: HistoricalRatesUseCase,
     private val dataStoreManager: DataStoreManager) : ViewModel()
 {
     private val _convertCurrencyState = MutableStateFlow<ConvertCurrencyState>(ConvertCurrencyState.Loading(false))
@@ -40,34 +37,13 @@ class ConvertCurrencyViewModel @Inject constructor(
 
     var convertParams = ConvertParams()
 
-    var sourceCurrency : String ?= null
-    var destinationCurrency : String ?= null
-
     var isSettingTextProgrammatically = false
-    var inputSource : InputValueSource = InputValueSource.FROM
     private var exchangeRates: ExchangeRatesUIModel? = null
 
     var symbolsList = ArrayList<String>()
 
-    init {
-        fetchHistoricalRates()
-        fetchLatestRates()
-        startRepeatingTask()
-    }
 
-    private fun fetchHistoricalRates() {
-
-        viewModelScope.launch {
-
-            val result = historicalRatesUseCase(HistoricalRatesParams(accessKey = BuildConfig.API_ACCESS_KEY, date = "2023-09-23"))
-
-            "historical result = ${result.toString()}".showLogMessage()
-
-            _convertCurrencyState.value = ConvertCurrencyState.SymbolsSuccess(symbolsList)
-        }
-    }
-
-    private fun fetchAllSymbols() {
+    fun fetchAllSymbols() {
 
         viewModelScope.launch {
             val result = symbolsUseCase(SymbolsParams(accessKey = BuildConfig.API_ACCESS_KEY, format = 1))
@@ -87,16 +63,12 @@ class ConvertCurrencyViewModel @Inject constructor(
                 is ApiResult.Success -> {
                     exchangeRates = result.data
                     saveLastFetchDate()
-                    _convertCurrencyState.value = ConvertCurrencyState.LatestFetchDate(getLastFetchedDate(getCurrentTimeInMilliSeconds()))
+                    _convertCurrencyState.value = ConvertCurrencyState.LatestFetchDate(getLastFetchedDate(getCurrentTimeInMilliSeconds()), TimeAgo.getTimeAgo(getCurrentTimeInMilliSeconds()))
                 }
                 is ApiResult.ApiError -> {
-                    val exception = result.exception
-                    "viewModel api error = ${exception.toString()}".showLogMessage()
                     _convertCurrencyState.value = ConvertCurrencyState.ApiError( "")
                 }
                 is ApiResult.InternetError -> {
-                    val exception = result.exception
-                    "viewModel internet error = ${exception.toString()}".showLogMessage()
                     _convertCurrencyState.value = ConvertCurrencyState.InternetError
                 }
                 is ApiResult.CashedData -> {
@@ -114,12 +86,12 @@ class ConvertCurrencyViewModel @Inject constructor(
         viewModelScope.launch {
             val fetchedDate : Long = dataStoreManager.getLastFetchDate() ?: getCurrentTimeInMilliSeconds()
             if (fetchedDate == 0.toLong()) {
-                _convertCurrencyState.value = ConvertCurrencyState.LatestFetchDate(getLastFetchedDate(
-                    getCurrentTimeInMilliSeconds()
-                ))
+                _convertCurrencyState.value = ConvertCurrencyState.LatestFetchDate(getLastFetchedDate(getCurrentTimeInMilliSeconds()), TimeAgo.getTimeAgo(getCurrentTimeInMilliSeconds()))
             }
             else {
-                _convertCurrencyState.value = ConvertCurrencyState.LatestFetchDate(getLastFetchedDate(fetchedDate ?: getCurrentTimeInMilliSeconds()))
+                _convertCurrencyState.value = ConvertCurrencyState.LatestFetchDate(getLastFetchedDate(
+                    fetchedDate
+                ), TimeAgo.getTimeAgo(getCurrentTimeInMilliSeconds()))
             }
         }
     }
@@ -129,12 +101,11 @@ class ConvertCurrencyViewModel @Inject constructor(
         viewModelScope.launch {
 
             exchangeRates?.let { rates ->
-                val fromRate = rates.rates[sourceCurrency]
-                val toRate = rates.rates[destinationCurrency]
+                val fromRate = rates.rates[convertParams.sourceCurrency]
+                val toRate = rates.rates[convertParams.destinationCurrency]
 
-                "sourceCurrency : ${fromRate}".showLogMessage()
-                "destinationCurrency : ${toRate}".showLogMessage()
-                "amount : ${convertParams.amount}".showLogMessage()
+                addCurrencyToDataStore(convertParams.sourceCurrency ?: "")
+                addCurrencyToDataStore(convertParams.destinationCurrency ?: "")
 
                 fromRate?.let { fromRateValue ->
                     toRate?.let { toRateValue ->
@@ -157,18 +128,37 @@ class ConvertCurrencyViewModel @Inject constructor(
     }
 
     private fun getLastFetchedDate(lastFetchedDate : Long) : String {
-        return "${lastFetchedDate.toFormattedDate()} - ${TimeAgo.getTimeAgo(lastFetchedDate)}"
+        return lastFetchedDate.toFormattedDate()
     }
 
     fun startRepeatingTask() {
-
         refreshLatestDateJob = viewModelScope.launch {
-                while (true) {
-                    getLastFetchDate()
-                    delay( 60 * 1000L)
-                }
+            while (true) {
+                getLastFetchDate()
+                delay(60 * 1000L)
+            }
         }
     }
+
+    private fun addCurrencyToDataStore(item: String) {
+        viewModelScope.launch {
+            val currentList = getCurrentList()
+
+            if (currentList.contains(item)) return@launch
+
+            val updatedList = if (currentList.size >= 5) {
+                currentList.drop(1) + item
+            } else {
+                currentList + item
+            }
+            dataStoreManager.saveCurrenciesList(updatedList, viewModelScope)
+        }
+    }
+
+    private fun getCurrentList(): List<String> {
+        return dataStoreManager.getCurrenciesList()
+    }
+
 
     override fun onCleared() {
         refreshLatestDateJob?.cancel()
