@@ -1,4 +1,4 @@
-package com.banquemisr.currency.ui.network
+package com.banquemisr.currency.ui.di
 
 sealed class ApiResult<out T> {
     data class Success<out T>(val data: T) : ApiResult<T>()

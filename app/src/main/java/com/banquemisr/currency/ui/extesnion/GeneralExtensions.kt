@@ -23,7 +23,6 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.roundToLong
 
 fun getMostCommonCurrencies(): ArrayList<String>{
     return arrayListOf(
@@ -39,30 +38,6 @@ fun Long.toFormattedDate(): String {
     val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
     return sdf.format(Date(this))
 }
-
-fun getAllCurrencies(): ArrayList<String>{
-    return arrayListOf(
-        "FJD", "MXN", "STD", "LVL", "SCR", "CDF", "BBD", "GTQ", "CLP", "HNL",
-        "UGX", "ZAR", "TND", "SLE", "CUC", "BSD", "SLL", "SDG", "IQD", "CUP",
-        "GMD", "TWD", "RSD", "DOP", "KMF", "MYR", "FKP", "XOF", "GEL", "BTC",
-        "UYU", "MAD", "CVE", "TOP", "AZN", "OMR", "PGK", "KES", "SEK", "BTN",
-        "UAH", "GNF", "ERN", "MZN", "SVC", "ARS", "QAR", "IRR", "MRO", "CNY",
-        "THB", "UZS", "XPF", "BDT", "LYD", "BMD", "KWD", "PHP", "RUB", "PYG",
-        "ISK", "JMD", "COP", "MKD", "USD", "DZD", "PAB", "GGP", "SGD", "ETB",
-        "JEP", "KGS", "SOS", "VEF", "VUV", "LAK", "BND", "ZMK", "XAF", "LRD",
-        "XAG", "CHF", "HRK", "ALL", "DJF", "VES", "ZMW", "TZS", "VND", "XAU",
-        "AUD", "ILS", "GHS", "GYD", "KPW", "BOB", "KHR", "MDL", "IDR", "KYD",
-        "AMD", "BWP", "SHP", "TRY", "LBP", "TJS", "JOD", "AED", "HKD", "RWF",
-        "EUR", "LSL", "DKK", "CAD", "BGN", "MMK", "MUR", "NOK", "SYP", "IMP",
-        "ZWL", "GIP", "RON", "LKR", "NGN", "CRC", "CZK", "PKR", "XCD", "ANG",
-        "HTG", "BHD", "KZT", "SRD", "SZL", "LTL", "SAR", "TTD", "YER", "MVR",
-        "AFN", "INR", "AWG", "KRW", "NPR", "JPY", "MNT", "AOA", "PLN", "GBP",
-        "SBD", "BYN", "HUF", "BYR", "BIF", "MWK", "MGA", "XDR", "BZD", "BAM",
-        "EGP", "MOP", "NAD", "SSP", "NIO", "PEN", "NZD", "WST", "TMT", "CLF",
-        "BRL"
-    )
-}
-
 
 fun getPxFromDp(dp: Float, context: Context): Int {
     val r: Resources = context.resources

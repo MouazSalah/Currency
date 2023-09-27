@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.banquemisr.currency.BuildConfig
 import com.banquemisr.currency.ui.data.model.history.HistoricalRatesParams
 import com.banquemisr.currency.ui.data.model.history.HistoryRateResponse
-import com.banquemisr.currency.ui.db.DataStoreManager
+import com.banquemisr.currency.ui.data.room.DataStoreManager
 import com.banquemisr.currency.ui.domain.usecase.history.HistoricalRatesUseCase
-import com.banquemisr.currency.ui.network.ApiResult
+import com.banquemisr.currency.ui.di.ApiResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HistoricalRatesViewModel @Inject constructor(
     private val historicalRatesUseCase: HistoricalRatesUseCase,
-    private val dataStoreManager: DataStoreManager) : ViewModel()
+    private val dataStoreManager: DataStoreManager
+) : ViewModel()
 {
     private val _historicalRatesState = MutableStateFlow<HistoricalRatesState>(HistoricalRatesState.Loading(false))
     val historicalRatesState: StateFlow<HistoricalRatesState> = _historicalRatesState

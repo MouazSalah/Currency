@@ -13,7 +13,7 @@ import com.banquemisr.currency.ui.data.model.symbols.Symbols
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
 import com.banquemisr.currency.ui.domain.mapper.ExchangeRatesMapper
 import com.banquemisr.currency.ui.extesnion.isNetworkAvailable
-import com.banquemisr.currency.ui.network.ApiResult
+import com.banquemisr.currency.ui.di.ApiResult
 import java.util.Locale
 import javax.inject.Inject
 

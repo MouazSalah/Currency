@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.banquemisr.currency.ui.data.datasource.CurrencyLocalDataSourceRepoImpl
 import com.banquemisr.currency.ui.data.datasource.ICurrencyLocalDataSourceRepo
-import com.banquemisr.currency.ui.db.CurrencyDao
-import com.banquemisr.currency.ui.db.RoomAppDatabase
+import com.banquemisr.currency.ui.data.room.CurrencyDao
+import com.banquemisr.currency.ui.data.room.RoomAppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,7 +28,7 @@ class LocalDataBaseModule {
 
     @Singleton
     @Provides
-    fun provideLocalDataSource(moviesDao : CurrencyDao): ICurrencyLocalDataSourceRepo = CurrencyLocalDataSourceRepoImpl(moviesDao)
+    fun provideLocalDataSource(currencyDao : CurrencyDao): ICurrencyLocalDataSourceRepo = CurrencyLocalDataSourceRepoImpl(currencyDao)
 
 
     @Singleton

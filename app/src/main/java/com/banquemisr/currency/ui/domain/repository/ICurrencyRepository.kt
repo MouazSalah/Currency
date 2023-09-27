@@ -6,7 +6,7 @@ import com.banquemisr.currency.ui.data.model.history.HistoryRateResponse
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesApiModel
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesUIModel
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
-import com.banquemisr.currency.ui.network.ApiResult
+import com.banquemisr.currency.ui.di.ApiResult
 
 interface ICurrencyRepository {
 

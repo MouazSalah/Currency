@@ -234,7 +234,7 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                     }
                     is ConvertCurrencyState.ConvertSuccess -> {
                         viewModel.isSettingTextProgrammatically = true
-                        binding.etPriceTo.setText(formatAmount(state.convertResponse.result ?: 0.0))
+                        binding.etPriceTo.setText(formatAmount(state.result ?: 0.0))
                         viewModel.isSettingTextProgrammatically = false
                     }
                     is ConvertCurrencyState.ApiError -> {

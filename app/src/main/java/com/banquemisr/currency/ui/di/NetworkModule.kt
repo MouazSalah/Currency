@@ -2,7 +2,6 @@ package com.banquemisr.currency.ui.di
 
 import android.content.Context
 import com.banquemisr.currency.BuildConfig
-import com.banquemisr.currency.ui.network.MovieInterceptor
 import com.banquemisr.currency.ui.data.api.CurrencyWebServices
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
@@ -22,12 +21,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
 
-    @DIAnnotation.MoviesRetrofit
+    @DIAnnotation.CurrencyRetrofit
     @Singleton
     @Provides
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        @DIAnnotation.MoviesInterceptor moviesInterceptor: MovieInterceptor,
+        @DIAnnotation.CurrencyInterceptor moviesInterceptor: CurrencyInterceptor,
         @ApplicationContext context: Context
     ): OkHttpClient {
         val okHttpClientBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
@@ -48,9 +47,9 @@ class NetworkModule {
         return okHttpClientBuilder.build()
     }
 
-    @DIAnnotation.MoviesRetrofit
+    @DIAnnotation.CurrencyRetrofit
     @Provides
-    fun provideAuthRetrofit(@DIAnnotation.MoviesRetrofit okHttpClient: OkHttpClient): Retrofit {
+    fun provideAuthRetrofit(@DIAnnotation.CurrencyRetrofit okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
@@ -66,12 +65,12 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideAuthApiService(@DIAnnotation.MoviesRetrofit retrofit: Retrofit): CurrencyWebServices = retrofit.create(
+    fun provideAuthApiService(@DIAnnotation.CurrencyRetrofit retrofit: Retrofit): CurrencyWebServices = retrofit.create(
         CurrencyWebServices::class.java)
 
 
-    @DIAnnotation.MoviesInterceptor
+    @DIAnnotation.CurrencyInterceptor
     @Singleton
     @Provides
-    fun provideMoviesInterceptor(): MovieInterceptor = MovieInterceptor()
+    fun provideCurrencyInterceptor(): CurrencyInterceptor = CurrencyInterceptor()
 }

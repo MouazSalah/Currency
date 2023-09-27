@@ -5,7 +5,7 @@ import com.banquemisr.currency.ui.data.datasource.ICurrencyLocalDataSourceRepo
 import com.banquemisr.currency.ui.data.api.ICurrencyRemoteDataSourceRepo
 import com.banquemisr.currency.ui.data.api.CurrencyWebServices
 import com.banquemisr.currency.ui.data.datasource.CurrencyRemoteDataSourceRepoImpl
-import com.banquemisr.currency.ui.db.CurrencyDao
+import com.banquemisr.currency.ui.data.room.CurrencyDao
 import com.banquemisr.currency.ui.domain.repository.ICurrencyRepository
 import com.banquemisr.currency.ui.domain.repository.CurrencyRepositoryImpl
 import dagger.Module
@@ -25,11 +25,11 @@ class RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideLocalDataSource(moviesDao : CurrencyDao): ICurrencyLocalDataSourceRepo = CurrencyLocalDataSourceRepoImpl(moviesDao)
+    fun provideLocalDataSource(currencyDao: CurrencyDao): ICurrencyLocalDataSourceRepo = CurrencyLocalDataSourceRepoImpl(currencyDao)
 
 
     @Singleton
     @Provides
-    fun provideMoviesRepository(localDataSource: CurrencyLocalDataSourceRepoImpl, remoteDataSource: CurrencyRemoteDataSourceRepoImpl) :
+    fun provideCurrencyRepository(localDataSource: CurrencyLocalDataSourceRepoImpl, remoteDataSource: CurrencyRemoteDataSourceRepoImpl) :
             ICurrencyRepository = CurrencyRepositoryImpl(localDataSource, remoteDataSource)
 }

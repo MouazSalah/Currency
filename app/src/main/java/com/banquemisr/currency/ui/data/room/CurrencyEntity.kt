@@ -1,4 +1,4 @@
-package com.banquemisr.currency.ui.db
+package com.banquemisr.currency.ui.data.room
 
 import androidx.room.Entity
 import androidx.room.Index

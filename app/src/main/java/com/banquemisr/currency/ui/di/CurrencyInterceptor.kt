@@ -1,4 +1,4 @@
-package com.banquemisr.currency.ui.network
+package com.banquemisr.currency.ui.di
 
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MovieInterceptor @Inject constructor() : Interceptor {
+class CurrencyInterceptor @Inject constructor() : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
 

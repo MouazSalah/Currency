@@ -7,15 +7,14 @@ import com.banquemisr.currency.ui.core.TimeAgo
 import com.banquemisr.currency.ui.data.model.convert.ConvertParams
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesParams
 import com.banquemisr.currency.ui.domain.usecase.rates.ExchangeRatesUseCase
-import com.banquemisr.currency.ui.data.model.convert.ConvertResponse
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesUIModel
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
-import com.banquemisr.currency.ui.db.DataStoreManager
+import com.banquemisr.currency.ui.data.room.DataStoreManager
 import com.banquemisr.currency.ui.domain.usecase.symbols.SymbolsUseCase
 import com.banquemisr.currency.ui.extesnion.getCurrentTimeInMilliSeconds
 import com.banquemisr.currency.ui.extesnion.showLogMessage
 import com.banquemisr.currency.ui.extesnion.toFormattedDate
-import com.banquemisr.currency.ui.network.ApiResult
+import com.banquemisr.currency.ui.di.ApiResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -28,7 +27,8 @@ import javax.inject.Inject
 class ConvertCurrencyViewModel @Inject constructor(
     private val exchangeRatesUseCase: ExchangeRatesUseCase,
     private val symbolsUseCase: SymbolsUseCase,
-    private val dataStoreManager: DataStoreManager) : ViewModel()
+    private val dataStoreManager: DataStoreManager
+) : ViewModel()
 {
     private val _convertCurrencyState = MutableStateFlow<ConvertCurrencyState>(ConvertCurrencyState.Loading(false))
     val convertCurrencyState: StateFlow<ConvertCurrencyState> = _convertCurrencyState
@@ -112,15 +112,7 @@ class ConvertCurrencyViewModel @Inject constructor(
                         val baseAmount = convertParams.amount?.div(fromRateValue)
                         val convertedAmount = baseAmount?.times(toRateValue)
 
-                        _convertCurrencyState.value = ConvertCurrencyState.ConvertSuccess(
-                            ConvertResponse(
-                                date = null,
-                                result = convertedAmount,
-                                success = null,
-                                query = null,
-                                info = null
-                            )
-                        )
+                        _convertCurrencyState.value = ConvertCurrencyState.ConvertSuccess(convertedAmount ?: 0.0)
                     }
                 }
             }

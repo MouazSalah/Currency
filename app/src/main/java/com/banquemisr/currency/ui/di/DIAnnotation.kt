@@ -6,9 +6,9 @@ object DIAnnotation {
 
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
-    annotation class MoviesRetrofit
+    annotation class CurrencyRetrofit
 
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
-    annotation class MoviesInterceptor
+    annotation class CurrencyInterceptor
 }
