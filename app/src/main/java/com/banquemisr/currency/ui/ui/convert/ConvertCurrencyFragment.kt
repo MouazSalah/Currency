@@ -2,6 +2,7 @@ package com.banquemisr.currency.ui.ui.convert
 
 import android.app.Activity
 import android.content.Intent
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.banquemisr.currency.R
 import com.banquemisr.currency.databinding.FragmentConvertCurrencyBinding
 import com.banquemisr.currency.ui.extesnion.afterTextChanged
@@ -18,6 +20,7 @@ import com.banquemisr.currency.ui.extesnion.castToActivity
 import com.banquemisr.currency.ui.extesnion.formatAmount
 import com.banquemisr.currency.ui.extesnion.getMostCommonCurrencies
 import com.banquemisr.currency.ui.extesnion.showLogMessage
+import com.banquemisr.currency.ui.ui.apierror.BottomSheetServerError
 import com.banquemisr.currency.ui.ui.base.BaseFragment
 import com.banquemisr.currency.ui.ui.base.MainActivity
 import com.banquemisr.currency.ui.ui.nointernet.NoInternetActivity
@@ -47,7 +50,23 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
         initObservers()
         initCurrenciesViews()
         initAmountViews()
+
+//        val totalTimeInMilliseconds = 60000 // 10 seconds
+//        val countdownTimer = object : CountDownTimer(totalTimeInMilliseconds.toLong(), 1000) {
+//            override fun onTick(millisUntilFinished: Long) {
+//                val progress = 100 - ((millisUntilFinished * 100) / totalTimeInMilliseconds)
+//                binding.circularCountdownView.setProgress(progress.toFloat())
+//                binding.circularCountdownView.timeLeft = (millisUntilFinished / 1000).toInt()
+//            }
+//
+//            override fun onFinish() {
+//                binding.circularCountdownView.setProgress(100f)
+//                binding.circularCountdownView.timeLeft = 0
+//            }
+//        }
+//        countdownTimer.start()
     }
+
 
     private fun initCurrenciesViews() {
 
@@ -273,9 +292,7 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
                     }
 
                     is ConvertCurrencyState.ApiError -> {
-                        "fragment api error".showLogMessage()
-                        Toast.makeText(requireContext(), "api error", Toast.LENGTH_SHORT).show()
-
+                        BottomSheetServerError().show(requireActivity().supportFragmentManager, null)
                     }
                     ConvertCurrencyState.InternetError -> {
                         "fragment internet error".showLogMessage()
@@ -297,6 +314,10 @@ class ConvertCurrencyFragment : BaseFragment<FragmentConvertCurrencyBinding>()
 
             refreshIcon.setOnClickListener {
                 viewModel.fetchLatestRates()
+            }
+
+            btnOk.setOnClickListener {
+                findNavController().navigate(R.id.action_converterFragment_to_historicalRatesFragment)
             }
 
             icSwitch.setOnClickListener {

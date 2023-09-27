@@ -21,8 +21,8 @@ interface CurrencyWebServices {
     suspend fun getExchangeRates(@QueryMap param: HashMap<String, String?>): Response<ExchangeRatesApiModel>
 
 
-    @GET(LATEST)
-    suspend fun getHistoricalRates(@QueryMap param: HashMap<String, String?>): Response<HistoryRateResponse>
+    @GET("{date}")
+    suspend fun getHistoricalRates(@Path("date") date : String, @QueryMap params: HashMap<String, String?>): Response<HistoryRateResponse>
 
     @GET(SYMBOLS)
     suspend fun getSymbols(@QueryMap param: HashMap<String, String?>): SymbolsResponse

@@ -142,6 +142,8 @@ android {
 
         // Data Store
         implementation("androidx.datastore:datastore-preferences:1.0.0")
+        implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+        implementation("com.github.AnyChart:AnyChart-Android:1.1.5")
     }
 }
 dependencies {

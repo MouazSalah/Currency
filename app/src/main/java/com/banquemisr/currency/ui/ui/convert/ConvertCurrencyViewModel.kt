@@ -8,9 +8,11 @@ import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesParams
 import com.banquemisr.currency.ui.domain.usecase.rates.ExchangeRatesUseCase
 import com.banquemisr.currency.ui.data.model.convert.ConvertParams
 import com.banquemisr.currency.ui.data.model.convert.ConvertResponse
+import com.banquemisr.currency.ui.data.model.history.HistoricalRatesParams
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesUIModel
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
 import com.banquemisr.currency.ui.db.DataStoreManager
+import com.banquemisr.currency.ui.domain.usecase.history.HistoricalRatesUseCase
 import com.banquemisr.currency.ui.domain.usecase.symbols.SymbolsUseCase
 import com.banquemisr.currency.ui.extesnion.getCurrentTimeInMilliSeconds
 import com.banquemisr.currency.ui.extesnion.showLogMessage
@@ -28,6 +30,7 @@ import javax.inject.Inject
 class ConvertCurrencyViewModel @Inject constructor(
     private val exchangeRatesUseCase: ExchangeRatesUseCase,
     private val symbolsUseCase: SymbolsUseCase,
+    private val historicalRatesUseCase: HistoricalRatesUseCase,
     private val dataStoreManager: DataStoreManager) : ViewModel()
 {
     private val _convertCurrencyState = MutableStateFlow<ConvertCurrencyState>(ConvertCurrencyState.Loading(false))
@@ -47,8 +50,21 @@ class ConvertCurrencyViewModel @Inject constructor(
     var symbolsList = ArrayList<String>()
 
     init {
+        fetchHistoricalRates()
         fetchLatestRates()
         startRepeatingTask()
+    }
+
+    private fun fetchHistoricalRates() {
+
+        viewModelScope.launch {
+
+            val result = historicalRatesUseCase(HistoricalRatesParams(accessKey = BuildConfig.API_ACCESS_KEY, date = "2023-09-23"))
+
+            "historical result = ${result.toString()}".showLogMessage()
+
+            _convertCurrencyState.value = ConvertCurrencyState.SymbolsSuccess(symbolsList)
+        }
     }
 
     private fun fetchAllSymbols() {

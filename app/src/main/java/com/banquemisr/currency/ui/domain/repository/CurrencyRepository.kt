@@ -13,7 +13,7 @@ import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesEntity
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesUIModel
 import com.banquemisr.currency.ui.data.model.symbols.Symbols
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
-import com.banquemisr.currency.ui.data.model.symbols.SymbolsResponse
+import com.banquemisr.currency.ui.db.CurrencyEntity
 import com.banquemisr.currency.ui.domain.mapper.ExchangeRatesMapper
 import com.banquemisr.currency.ui.extesnion.isNetworkAvailable
 import com.banquemisr.currency.ui.network.ApiResult
@@ -60,73 +60,25 @@ class CurrencyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getHistoricalRates(params: HistoricalRatesParams): ApiResult<HistoryRateResponse> {
-        TODO("Not yet implemented")
+        return if (isNetworkAvailable(BaseApp.instance.applicationContext)) {
+            try {
+                val response = remoteDataSource.getHistoricalRates(params)
+                if (response.isSuccessful) {
+                    response.body()?.let { historyRateResponse ->
+                        ApiResult.Success(historyRateResponse)
+                    } ?: run {
+                        ApiResult.ApiError("${response.code()} - ${response.message()}")
+                    }
+                } else {
+                    ApiResult.ApiError("${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                ApiResult.ApiError(e.message.toString())
+            }
+        } else {
+            ApiResult.InternetError("No internet connection")
+        }
     }
-
-//    override suspend fun getExchangeRatesFromApi(params: ExchangeRatesParams): ApiResult<ExchangeRatesUIModel> {
-//        return if (isNetworkAvailable(BaseApp.instance.applicationContext))
-//        {
-//            try
-//            {
-//                val response = remoteDataSource.getExchangeRates(params)
-//
-//                if (response.isSuccessful) {
-//
-//                    val exchangeRatesResponse = response.body()
-//
-//                    if (exchangeRatesResponse != null) {
-//                        insertExchangeRatesToRoom(exchangeRatesResponse)
-//                        val exchangeRateUIModel = ExchangeRatesMapper.mapApiModelToUIModel(exchangeRatesResponse)
-//                        ApiResult.Success(exchangeRateUIModel)
-//                    } else {
-//                        val exchangeRateUIModel: ExchangeRatesUIModel? = getExchangeRatesFromRoom()
-//                        if (exchangeRateUIModel != null) {
-//                            ApiResult.CashedData(exchangeRateUIModel)
-//                        } else {
-//                            ApiResult.ApiError("${response.code()} - ${response.message()}")
-//                        }
-//                    }
-//                } else {
-//                    // Non-successful HTTP response
-//                    val exchangeRateUIModel: ExchangeRatesUIModel? =
-//                        getExchangeRatesFromRoom() // Assuming getExchangeRatesFromRoom() returns non-null
-//                    if (exchangeRateUIModel != null) {
-//                        ApiResult.CashedData(exchangeRateUIModel)
-//                    } else {
-//                        ApiResult.ApiError("${response.code()} - ${response.message()}")
-//                    }
-//                }
-//            }
-//            catch (e: Exception)
-//            {
-//
-//                val exchangeRateUIModel: ExchangeRatesUIModel? =
-//                    getExchangeRatesFromRoom() // Assuming getExchangeRatesFromRoom() returns non-null
-//                if (exchangeRateUIModel != null) {
-//                    ApiResult.CashedData(exchangeRateUIModel)
-//                } else {
-//                    ApiResult.ApiError(e.message.toString())
-//                }
-//
-//                //                    val errorJson = response.errorBody()?.string()
-////                    val gson = Gson()
-////                    val errorResponse = gson.fromJson(errorJson, ErrorResponse::class.java)
-////
-////                    val errorCode = errorResponse.error.code
-////                    val errorInfo = errorResponse.error.info
-////                    "response errorCode = ${errorCode.toString()}".showLogMessage()
-////                    "response errorInfo = ${errorInfo.toString()}".showLogMessage()
-//            }
-//        } else {
-//
-//            val exchangeRateUIModel: ExchangeRatesUIModel? = getExchangeRatesFromRoom()
-//            if (exchangeRateUIModel != null) {
-//                ApiResult.CashedData(exchangeRateUIModel)
-//            } else {
-//                ApiResult.InternetError("No internet connection")
-//            }
-//        }
-//    }
 
     override suspend fun insertExchangeRatesToRoom(exchangeRates: ExchangeRatesApiModel) {
         val exchangeRatesEntity: ExchangeRatesEntity =
@@ -154,15 +106,7 @@ class CurrencyRepositoryImpl @Inject constructor(
         currencySymbols = symbols.javaClass.declaredFields
             .map { it.name }
             .map { it.substring(0, 3) }
-            .map { it.toUpperCase() }.toMutableList()
-
-//        for (field in fields) {
-//            field.isAccessible = true
-//            val symbol = field.get(symbols) as? String
-//            symbol?.let {
-//                currencySymbols.add(it.uppercase(Locale.ROOT))
-//            }
-//        }
+            .map { it.uppercase(Locale.ROOT) }.toMutableList()
 
         return currencySymbols
     }
@@ -171,5 +115,14 @@ class CurrencyRepositoryImpl @Inject constructor(
     override suspend fun convertAmount(params: ConvertParams): ConvertResponse {
         return remoteDataSource.convertAmount(params)
     }
+
+//    override suspend fun getCurrencies(): ApiResult<CurrencyEntity> {
+//
+//        return localDataSourceRepo.loadCurrencies()?.let {
+//            ApiResult.CashedData(it)
+//        } ?: ApiResult.ApiError("No Currencies")
+//    }
+//
+//    override suspend fun insertCurrencies(currencies: CurrencyEntity) = localDataSourceRepo.insertCurrencies(currencies)
 
 }

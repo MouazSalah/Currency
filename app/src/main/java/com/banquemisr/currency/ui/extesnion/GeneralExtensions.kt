@@ -36,7 +36,7 @@ fun getCurrentTimeInMilliSeconds() : Long {
 }
 
 fun Long.toFormattedDate(): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
     return sdf.format(Date(this))
 }
 

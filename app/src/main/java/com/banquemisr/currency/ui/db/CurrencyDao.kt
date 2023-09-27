@@ -14,4 +14,11 @@ interface CurrencyDao {
 
     @Query("SELECT * FROM exchange_rates")
     suspend fun getExchangeRates(): ExchangeRatesEntity?
+
+
+//    @Insert(onConflict = OnConflictStrategy.IGNORE)
+//    suspend fun insertCurrencies(currencyEntity: CurrencyEntity)
+//
+//    @Query("SELECT * FROM cashed_currencies")
+//    suspend fun getCurrencies(): CurrencyEntity?
 }

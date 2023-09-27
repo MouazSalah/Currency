@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fillViewport="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/_8sdp"
+        android:background="@color/white">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_historical_rates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_historical_rate_exchange_rate" />
+
+        <com.github.mikephil.charting.charts.BubbleChart
+            android:id="@+id/lineChart"
+            android:layout_marginTop="@dimen/_40sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rv_historical_rates"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_200sdp" />
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/bar_charts"
+            android:layout_marginTop="@dimen/_40sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lineChart"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_200sdp"
+            android:background="@android:color/white"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/shimmer_layout"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <include layout="@layout/shimmer_exchange_rate" />
+            <include layout="@layout/shimmer_exchange_rate" />
+            <include layout="@layout/shimmer_exchange_rate" />
+            <include layout="@layout/shimmer_exchange_rate" />
+            <include layout="@layout/shimmer_exchange_rate" />
+            <include layout="@layout/shimmer_exchange_rate" />
+            <include layout="@layout/shimmer_exchange_rate" />
+            <include layout="@layout/shimmer_exchange_rate" />
+            <include layout="@layout/shimmer_exchange_rate" />
+            <include layout="@layout/shimmer_exchange_rate" />
+            <include layout="@layout/shimmer_exchange_rate" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
+

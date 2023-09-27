@@ -10,6 +10,7 @@ import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesApiModel
 import com.banquemisr.currency.ui.data.model.rates.ExchangeRatesParams
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsParams
 import com.banquemisr.currency.ui.data.model.symbols.SymbolsResponse
+import com.banquemisr.currency.ui.extesnion.showLogMessage
 import com.banquemisr.currency.ui.extesnion.toHashMapParams
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
@@ -23,7 +24,10 @@ class CurrencyRemoteDataSourceRepoImpl @Inject constructor(private val apiInterf
     }
 
     override suspend fun getHistoricalRates(params: HistoricalRatesParams): Response<HistoryRateResponse> {
-        return apiInterface.getHistoricalRates(params.toHashMapParams()!!)
+        val date = params.date.toString()
+        params.date = null
+        val result = apiInterface.getHistoricalRates(date = date, params = params.toHashMapParams()!!)
+        return result
     }
 
     override suspend fun getSymbols(params: SymbolsParams): SymbolsResponse {

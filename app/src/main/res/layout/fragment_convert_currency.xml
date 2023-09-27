@@ -223,4 +223,34 @@
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
+    <com.banquemisr.currency.ui.ui.customviews.CircularCountdownView
+        android:id="@+id/circularCountdownView"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:padding="@dimen/_2sdp"
+        android:layout_marginTop="@dimen/_24sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_latest_date" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_ok"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="@dimen/_200sdp"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:fontFamily="@font/roboto_bold"
+        app:layout_constraintTop_toBottomOf="@+id/circularCountdownView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:strokeColor="@color/color_bank_masr"
+        android:text="Details"
+        android:layout_marginTop="@dimen/_24sdp"
+        android:textColor="@color/color_bank_masr"
+        app:cornerRadius="@dimen/_4sdp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:textSize="@dimen/_14ssp"/>
+
 </com.banquemisr.currency.ui.ui.customviews.ClickableConstraintLayout>

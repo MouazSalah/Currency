@@ -12,6 +12,14 @@
         android:name="com.banquemisr.currency.ui.ui.convert.ConvertCurrencyFragment"
         tools:layout="@layout/fragment_convert_currency" >
 
+        <action
+            android:id="@+id/action_converterFragment_to_historicalRatesFragment"
+            app:destination="@id/historicalRatesFragment" />
     </fragment>
-    
+
+    <fragment
+        android:id="@+id/historicalRatesFragment"
+        android:name="com.banquemisr.currency.ui.ui.details.HistoricalRatesFragment"
+        android:label="HistoricalRatesFragment" />
+
 </navigation>
