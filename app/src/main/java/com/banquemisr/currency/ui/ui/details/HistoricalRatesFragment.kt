@@ -1,28 +1,61 @@
 package com.banquemisr.currency.ui.ui.details
 
 import android.graphics.Color
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.banquemisr.currency.R
 import com.banquemisr.currency.databinding.FragmentHistoricalRatesBinding
+import com.banquemisr.currency.ui.data.model.history.HistoryRateResponse
 import com.banquemisr.currency.ui.extesnion.castToActivity
 import com.banquemisr.currency.ui.ui.base.BaseFragment
 import com.banquemisr.currency.ui.ui.base.MainActivity
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.BubbleChart
+import com.github.mikephil.charting.charts.CandleStickChart
+import com.github.mikephil.charting.charts.CombinedChart
+import com.github.mikephil.charting.charts.HorizontalBarChart
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.charts.RadarChart
+import com.github.mikephil.charting.charts.ScatterChart
 import com.github.mikephil.charting.components.Description
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.BubbleData
 import com.github.mikephil.charting.data.BubbleDataSet
 import com.github.mikephil.charting.data.BubbleEntry
+import com.github.mikephil.charting.data.CandleData
+import com.github.mikephil.charting.data.CandleDataSet
+import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.CombinedData
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.data.RadarData
+import com.github.mikephil.charting.data.RadarDataSet
+import com.github.mikephil.charting.data.RadarEntry
+import com.github.mikephil.charting.data.ScatterData
+import com.github.mikephil.charting.data.ScatterDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 @AndroidEntryPoint
 class HistoricalRatesFragment : BaseFragment<FragmentHistoricalRatesBinding>() {
@@ -71,58 +104,11 @@ class HistoricalRatesFragment : BaseFragment<FragmentHistoricalRatesBinding>() {
                     is HistoricalRatesState.Success -> {
                         moviesAdapter.setList(state.historicalRates)
 
-                        val dates = listOf("2023-09-23", "2023-09-24", "2023-09-25")
-                        val exchangeRates = listOf(1.0, 1.1, 1.2)
-
-                        val barData = generateBarData(dates, exchangeRates)
-
-                        binding.barCharts.data = barData
-                        binding.barCharts.description.text = "Exchange Rates Chart"
-                        binding.barCharts.xAxis.valueFormatter = IndexAxisValueFormatter(dates) // Set x-axis labels
-                        binding.barCharts.animateXY(2000, 2000)
-                        binding.barCharts.invalidate()
-
-
-//                        val barData = getDataSet()
-//                        binding.barCharts.data = barData
-//                        binding.barCharts.description.text = "Exchange Rates Chart"
-//                        binding.barCharts.animateXY(2000, 2000)
-//                        binding.barCharts.invalidate()
-
-//                        // Customize chart appearance and behavior
-//                        binding.lineChart.description = Description().apply {
-//                            text = "Currency Exchange Rates"
-//                            textSize = 12f
-//                        }
-//                        binding.lineChart.setDrawGridBackground(false)
-//
-//                        // Create a list of data points (entries)
-//                        val entries = ArrayList<Entry>()
-//                        entries.add(Entry(1f, 30f))
-//                        entries.add(Entry(2f, 32f))
-//                        entries.add(Entry(3f, 28f))
-//                        // Add more entries as needed
-//
-//                        // Create a LineDataSet to hold the data and customize its appearance
-//                        val dataSet = LineDataSet(entries, "Exchange Rate")
-//                        dataSet.setDrawCircles(true)
-//                        dataSet.color = Color.BLUE
-//                        dataSet.lineWidth = 2f
-//
-//                        // Create a list of LineDataSets (if you have multiple lines on the chart)
-//                        val dataSets = ArrayList<ILineDataSet>()
-//                        dataSets.add(dataSet)
-//
-//                        // Create a LineData object from the datasets
-//                        val lineData = LineData(dataSets)
-//
-//                        // Set the data for the chart
-//                        binding.lineChart.data = lineData
-//
-//                        // Refresh the chart
-//                        binding.lineChart.invalidate()
-
-
+                        drawLineChart(historyRateResponse = viewModel.historicalRateResponse!!, dates = viewModel.historicalDates, currencies = viewModel.historicalCurrencies)
+                        drawBarChart(historyRateResponse = viewModel.historicalRateResponse!!, dates = viewModel.historicalDates, currencies = viewModel.historicalCurrencies)
+                        drawBubbleChart(binding.bubbleCharts, historyRateResponse = viewModel.historicalRateResponse!!, dates = viewModel.historicalDates, currencies = viewModel.historicalCurrencies)
+                        drawCandleStickChart(binding.candlesCharts, historyRateResponse = viewModel.historicalRateResponse!!, dates = viewModel.historicalDates)
+                        drawCombinedChart(binding.combinedCharts, historyRateResponse = viewModel.historicalRateResponse!!, dates = viewModel.historicalDates, currencies = viewModel.historicalCurrencies)
                     }
                 }
             }
@@ -152,41 +138,281 @@ class HistoricalRatesFragment : BaseFragment<FragmentHistoricalRatesBinding>() {
     }
 
 
-    private fun getDataSet(): BarData {
+    private fun drawBarChart(historyRateResponse: HistoryRateResponse, dates: List<String>, currencies: List<String>) {
 
-        val valueSet1 = ArrayList<BarEntry>()
-        valueSet1.add(BarEntry(0f, 110.000f)) // Jan
-        valueSet1.add(BarEntry(1f, 40.000f))  // Feb
-        valueSet1.add(BarEntry(2f, 60.000f))  // Mar
-        valueSet1.add(BarEntry(3f, 30.000f))  // Apr
-        valueSet1.add(BarEntry(4f, 90.000f))  // May
-        valueSet1.add(BarEntry(5f, 100.000f)) // Jun
+        val barEntries = mutableListOf<BarEntry>()
 
+        for (i in dates.indices) {
+            val date = dates[i]
+            val currencyEntries = mutableListOf<Float>()
 
-        val valueSet2 = ArrayList<BarEntry>()
-        valueSet2.add(BarEntry(0f, 110.000f)) // Jan
-        valueSet2.add(BarEntry(1f, 40.000f))  // Feb
-        valueSet2.add(BarEntry(2f, 60.000f))  // Mar
-        valueSet2.add(BarEntry(3f, 30.000f))  // Apr
-        valueSet2.add(BarEntry(4f, 90.000f))  // May
-        valueSet2.add(BarEntry(5f, 100.000f)) // Jun
+            for (currency in currencies) {
+                val rate = historyRateResponse.rates[currency]?.toFloat() ?: 0f // Default value for missing currencies
+                currencyEntries.add(rate)
+            }
 
-        val barDataSet1 = BarDataSet(valueSet1, "Brand 1")
-        barDataSet1.color = Color.rgb(0, 155, 0)
+            barEntries.add(BarEntry(i.toFloat(), currencyEntries.toFloatArray()))
+        }
 
-        val barDataSet2 = BarDataSet(valueSet2, "Brand 2")
-        barDataSet2.colors = ColorTemplate.COLORFUL_COLORS.toList()
+        val barDataSet = BarDataSet(barEntries, "")
+        barDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
+        barDataSet.stackLabels = currencies.toTypedArray()
 
-        val barData = BarData(barDataSet1, barDataSet2)
+        val barData = BarData(barDataSet)
+        binding.barCharts.data = barData
 
-        return barData
+        val xAxis = binding.barCharts.xAxis
+        xAxis.valueFormatter = IndexAxisValueFormatter(dates)
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.setDrawAxisLine(true)
+
+        binding.barCharts.description.text = "Exchange Rates for the Last Three Days"
+        binding.barCharts.setFitBars(true)
+        binding.barCharts.invalidate()
     }
 
-    private fun getXAxisValues(): ArrayList<String> {
-        val xAxis = ArrayList<String>()
-        xAxis.add("yesterday")
-        xAxis.add("2-23-09-25")
-        xAxis.add("2-23-09-24")
-        return xAxis
+    private fun drawLineChart(
+        historyRateResponse: HistoryRateResponse,
+        dates: List<String>,
+        currencies: List<String>
+    ) {
+        val lineEntries = mutableListOf<List<Entry>>()
+
+        for (currency in currencies) {
+            val currencyEntries = mutableListOf<Entry>()
+
+            for (i in dates.indices) {
+                val date = dates[i]
+                val rate = historyRateResponse.rates[currency]?.toFloat() ?: 0f // Default value for missing currencies
+                currencyEntries.add(Entry(i.toFloat(), rate))
+            }
+
+            lineEntries.add(currencyEntries)
+        }
+
+        val lineDataSets = mutableListOf<LineDataSet>()
+
+        for (i in currencies.indices) {
+            val lineDataSet = LineDataSet(lineEntries[i], currencies[i])
+            lineDataSet.color = ColorTemplate.COLORFUL_COLORS[i]
+            lineDataSet.setCircleColor(ColorTemplate.COLORFUL_COLORS[i])
+            lineDataSet.setDrawValues(false)
+            lineDataSets.add(lineDataSet)
+        }
+
+        val lineData = LineData(lineDataSets as List<ILineDataSet>?)
+        binding.lineChart.data = lineData
+
+        val xAxis = binding.lineChart.xAxis
+        xAxis.valueFormatter = IndexAxisValueFormatter(dates)
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.setDrawAxisLine(true)
+
+        binding.lineChart.description.text = "Exchange Rates for the Last Three Days"
+        binding.lineChart.invalidate()
     }
+
+
+    fun drawBubbleChart(
+        bubbleChart: BubbleChart,
+        historyRateResponse: HistoryRateResponse,
+        dates: List<String>,
+        currencies: List<String>
+    ) {
+        val bubbleEntries = mutableListOf<List<BubbleEntry>>()
+
+        for (currency in currencies) {
+            val currencyEntries = mutableListOf<BubbleEntry>()
+
+            for (i in dates.indices) {
+                val date = dates[i]
+                val rate = historyRateResponse.rates[currency]?.toFloat() ?: 0f // Default value for missing currencies
+                currencyEntries.add(BubbleEntry(i.toFloat(), rate, rate))
+            }
+
+            bubbleEntries.add(currencyEntries)
+        }
+
+        val bubbleDataSets = mutableListOf<BubbleDataSet>()
+
+        for (i in currencies.indices) {
+            val bubbleDataSet = BubbleDataSet(bubbleEntries[i], currencies[i])
+            bubbleDataSet.color = ColorTemplate.COLORFUL_COLORS[i]
+            bubbleDataSet.setDrawValues(false)
+            bubbleDataSets.add(bubbleDataSet)
+        }
+
+        val bubbleData = BubbleData(bubbleDataSets as List<IBubbleDataSet>?)
+        bubbleChart.data = bubbleData
+
+        val xAxis = bubbleChart.xAxis
+        xAxis.valueFormatter = IndexAxisValueFormatter(dates)
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.setDrawAxisLine(true)
+
+        bubbleChart.description.text = "Exchange Rates for the Last Three Days"
+        bubbleChart.invalidate()
+    }
+
+
+    fun drawCandleStickChart(
+        candleStickChart: CandleStickChart,
+        historyRateResponse: HistoryRateResponse,
+        dates: List<String>
+    ) {
+        val candleEntries = mutableListOf<List<CandleEntry>>()
+
+        // Extract open, close, high, and low values from the historyRateResponse for each date
+        for (date in dates) {
+            val open = historyRateResponse.rates[date]?.toFloat() ?: 0f
+            val close = open // For simplicity, assuming open and close are the same
+            val high = open // For simplicity, assuming high is the same as open
+            val low = open // For simplicity, assuming low is the same as open
+
+            val candleEntry = CandleEntry(
+                dates.indexOf(date).toFloat(),
+                high,
+                low,
+                open,
+                close
+            )
+            candleEntries.add(listOf(candleEntry))
+        }
+
+        val candleDataSets = mutableListOf<CandleDataSet>()
+
+        val candleDataSet = CandleDataSet(candleEntries[0], "Exchange Rates")
+        candleDataSet.color = ColorTemplate.COLORFUL_COLORS[0]
+        candleDataSet.shadowColor = Color.DKGRAY
+        candleDataSet.shadowWidth = 0.7f
+        candleDataSets.add(candleDataSet)
+
+        val candleData = CandleData(candleDataSets as List<ICandleDataSet>?)
+        candleStickChart.data = candleData
+
+        val xAxis = candleStickChart.xAxis
+        xAxis.valueFormatter = IndexAxisValueFormatter(dates)
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.setDrawAxisLine(true)
+
+        candleStickChart.description.text = "Candlestick Chart for Exchange Rates"
+        candleStickChart.invalidate()
+    }
+
+
+    fun drawCombinedChart(
+        combinedChart: CombinedChart,
+        historyRateResponse: HistoryRateResponse,
+        dates: List<String>,
+        currencies: List<String>
+    ) {
+        val combinedData = CombinedData()
+
+        // Create LineData for line chart
+        val lineEntries = mutableListOf<List<Entry>>()
+
+        for (currency in currencies) {
+            val currencyEntries = mutableListOf<Entry>()
+
+            for (i in dates.indices) {
+                val date = dates[i]
+                val rate = historyRateResponse.rates[currency]?.toFloat() ?: 0f // Default value for missing currencies
+                currencyEntries.add(Entry(i.toFloat(), rate))
+            }
+
+            lineEntries.add(currencyEntries)
+        }
+
+        val lineDataSets = mutableListOf<ILineDataSet>()
+
+        for (i in currencies.indices) {
+            val lineDataSet = LineDataSet(lineEntries[i], currencies[i])
+            lineDataSet.color = ColorTemplate.COLORFUL_COLORS[i]
+            lineDataSet.setCircleColor(ColorTemplate.COLORFUL_COLORS[i])
+            lineDataSet.setDrawValues(false)
+            lineDataSets.add(lineDataSet)
+        }
+
+        val lineData = LineData(lineDataSets)
+        combinedData.setData(lineData)
+
+        // Create BarData for bar chart
+        val barEntries = mutableListOf<List<BarEntry>>()
+
+        for (currency in currencies) {
+            val currencyEntries = mutableListOf<BarEntry>()
+
+            for (i in dates.indices) {
+                val date = dates[i]
+                val rate = historyRateResponse.rates[currency]?.toFloat() ?: 0f // Default value for missing currencies
+                currencyEntries.add(BarEntry(i.toFloat(), rate))
+            }
+
+            barEntries.add(currencyEntries)
+        }
+
+        val barDataSets = mutableListOf<IBarDataSet>()
+
+        for (i in currencies.indices) {
+            val barDataSet = BarDataSet(barEntries[i], currencies[i])
+            barDataSet.color = ColorTemplate.COLORFUL_COLORS[i]
+            barDataSets.add(barDataSet)
+        }
+
+        val barData = BarData(barDataSets)
+        combinedData.setData(barData)
+
+        // Create CandleData for candlestick chart
+        val candleEntries = mutableListOf<List<CandleEntry>>()
+
+        for (date in dates) {
+            val open = historyRateResponse.rates[date]?.toFloat() ?: 0f
+            val close = open
+            val high = open
+            val low = open
+
+            val candleEntry = CandleEntry(
+                dates.indexOf(date).toFloat(),
+                high,
+                low,
+                open,
+                close
+            )
+            candleEntries.add(listOf(candleEntry))
+        }
+
+        val candleDataSets = mutableListOf<ICandleDataSet>()
+
+        val candleDataSet = CandleDataSet(candleEntries[0], "Candlestick")
+        candleDataSet.color = ColorTemplate.COLORFUL_COLORS[currencies.size]
+        candleDataSet.shadowColor = Color.DKGRAY
+        candleDataSet.shadowWidth = 0.7f
+        candleDataSets.add(candleDataSet)
+
+        val candleData = CandleData(candleDataSets)
+        combinedData.setData(candleData)
+
+        // Set combined chart data
+        combinedChart.data = combinedData
+
+        // Configure x-axis
+        val xAxis = combinedChart.xAxis
+        xAxis.valueFormatter = IndexAxisValueFormatter(dates)
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.setDrawAxisLine(true)
+
+        // Set chart description
+        combinedChart.description.text = "Combined Chart for Exchange Rates"
+        combinedChart.invalidate()
+    }
+
+
+
+
+
 }

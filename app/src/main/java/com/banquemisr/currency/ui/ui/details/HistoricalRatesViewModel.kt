@@ -27,6 +27,10 @@ class HistoricalRatesViewModel @Inject constructor(
     val historicalRatesState: StateFlow<HistoricalRatesState> = _historicalRatesState
 
     var historicalRates = ArrayList<Any>()
+    var historicalCurrencies = ArrayList<String>()
+    var historicalDates = ArrayList<String>()
+
+    var historicalRateResponse: HistoryRateResponse? = null
 
     init {
         getDaysDates()
@@ -52,6 +56,18 @@ class HistoricalRatesViewModel @Inject constructor(
         val dayBeforeBeforeYesterday = today.minusDays(2)
         val dayBeforeBeforeYesterdayFormatted = dayBeforeBeforeYesterday.format(dateFormatter)
 
+        historicalDates.clear()
+        historicalDates.add(yesterdayFormatted)
+        historicalDates.add(dayBeforeYesterdayFormatted)
+        historicalDates.add(dayBeforeBeforeYesterdayFormatted)
+
+
+        historicalCurrencies.clear()
+        historicalCurrencies.add("USD")
+        historicalCurrencies.add("AED")
+        historicalCurrencies.add("EGP")
+        historicalCurrencies.add("EUR")
+
         // Print the dates
         println("Today: $todayFormatted")
         println("Yesterday: $yesterdayFormatted")
@@ -71,6 +87,10 @@ class HistoricalRatesViewModel @Inject constructor(
             )
 
             if (result is ApiResult.Success) {
+
+                historicalRateResponse = result.data
+                historicalRateResponse = result.data
+
 
                 val desiredCurrencyCodes = listOf("USD", "AED", "EGP", "EUR")
                 val currencyRates = extractCurrencyRates(result.data, desiredCurrencyCodes)
